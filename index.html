@@ -122,7 +122,7 @@
                             <i data-lucide="table-2" class="w-3 h-3"></i> 발주수량 & 면세/과세 금액 누적
                         </span>
                         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 font-mono">
-                            v1.1
+                            v1.2.3
                         </span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-stone-800 mt-1.5">바로가 공장 원재료 발주 통합 대시보드</h1>
@@ -141,6 +141,13 @@
                         <i id="gsSyncIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
+
+                <!-- 금액(단가) 변동 알림 버튼 -->
+                <button id="priceAlertHeaderBtn" onclick="openPriceAlertModal('PERIOD')" class="px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:bg-amber-50 hover:border-amber-300 transition flex items-center gap-1.5 whitespace-nowrap">
+                    <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-600"></i>
+                    <span>금액변동 알림</span>
+                    <span id="priceAlertCountBadge" class="hidden px-1.5 py-0.5 rounded-full text-[10px] leading-none font-extrabold bg-red-600 text-white">0</span>
+                </button>
 
                 <!-- CSV 다운로드 -->
                 <button onclick="exportSummaryCSV()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 transition flex items-center gap-1.5 whitespace-nowrap">
@@ -173,7 +180,6 @@
                     <p id="kpiOrderSub" class="text-xs text-stone-400 mt-1">총 0개 품목 · 0건 발주</p>
                 </div>
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100/80 border border-blue-200/80 shadow-2xs flex items-center justify-center shrink-0">
-                    <!-- 3D 입고 박스 & 체크 배지 듀오톤 아이콘 -->
                     <svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M13 3.2L22.5 8.5V18.8L13 24.1L3.5 18.8V8.5L13 3.2Z" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.7" stroke-linejoin="round"/>
                         <path d="M3.8 8.7L13 13.8L22.2 8.7" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -193,7 +199,6 @@
                     <p id="kpiVatSub" class="text-xs font-semibold text-indigo-700 mt-1">부가세 포함: 0원</p>
                 </div>
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#18242C] to-slate-800 border border-slate-700 shadow-2xs flex items-center justify-center shrink-0">
-                    <!-- 원화(₩) 골드 코인 배지 아이콘 -->
                     <svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="14" cy="14" r="10" fill="#DFC082" fill-opacity="0.18" stroke="#DFC082" stroke-width="1.7"/>
                         <path d="M8.8 10.2L11.2 18.2L14 11.5L16.8 18.2L19.2 10.2" stroke="#FDE68A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -211,7 +216,6 @@
                     <p id="kpiTaxableSub" class="text-xs text-stone-400 mt-1">전체 0.0% · 부가세 0원</p>
                 </div>
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-100/80 border border-amber-200/90 shadow-2xs flex items-center justify-center shrink-0">
-                    <!-- 세금계산서 & 부가세(%) 배지 듀오톤 아이콘 -->
                     <svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6 5.5C6 4.4 6.9 3.5 8 3.5H17.5L21 7V22.5L18.5 21L16 22.5L13.5 21L11 22.5L8.5 21L6 22.5V5.5Z" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6" stroke-linejoin="round"/>
                         <path d="M9.5 9H15.5" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/>
@@ -230,7 +234,6 @@
                     <p id="kpiTaxFreeRatio" class="text-xs text-stone-400 mt-1">전체 금액 중 0.0%</p>
                 </div>
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-100/80 border border-emerald-200/90 shadow-2xs flex items-center justify-center shrink-0">
-                    <!-- 면세 안심 실드(방패) & 체크 듀오톤 아이콘 -->
                     <svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M14 3.5L22.5 6.8V13.6C22.5 18.8 18.9 22.9 14 24.6C9.1 22.9 5.5 18.8 5.5 13.6V6.8L14 3.5Z" fill="#D1FAE5" stroke="#059669" stroke-width="1.7" stroke-linejoin="round"/>
                         <path d="M10.3 14.1L12.9 16.7L18 11.4" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -270,7 +273,6 @@
 
                 <!-- 1월~12월 월별 탭 -->
                 <div id="monthTabsContainer" class="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full py-0.5">
-                    <!-- JS로 1월~12월 렌더링 -->
                 </div>
             </div>
 
@@ -349,18 +351,14 @@
                     </button>
                 </div>
 
-                <!-- 1) 일자별 발주 이력 뷰 (기본 디폴트 뷰) -->
+                <!-- 1) 일자별 발주 이력 뷰 -->
                 <div id="viewHistoryContainer" class="flex-1 p-4 bg-stone-100/60 overflow-y-auto max-h-[680px]">
-                    <div id="historyCardsContainer" class="space-y-4">
-                        <!-- JS 렌더링 -->
-                    </div>
+                    <div id="historyCardsContainer" class="space-y-4"></div>
                 </div>
 
                 <!-- 2) 거래처별 발주 현황 뷰 -->
                 <div id="viewVendorContainer" class="hidden flex-1 p-4 bg-stone-100/60 overflow-y-auto max-h-[680px]">
-                    <div id="vendorCardsContainer" class="space-y-4">
-                        <!-- JS 렌더링 -->
-                    </div>
+                    <div id="vendorCardsContainer" class="space-y-4"></div>
                 </div>
 
                 <!-- 3) 원재료별 누적 합계 테이블 뷰 -->
@@ -381,13 +379,11 @@
                                 <th class="py-2.5 px-2.5 text-center">발주횟수</th>
                             </tr>
                         </thead>
-                        <tbody id="summaryTableBody" class="divide-y divide-stone-100 text-xs sm:text-sm">
-                            <!-- JS 렌더링 -->
-                        </tbody>
+                        <tbody id="summaryTableBody" class="divide-y divide-stone-100 text-xs sm:text-sm"></tbody>
                     </table>
                 </div>
 
-                <!-- 카드 하단 총계 요약 바 (총 누적금액 + 부가세 포함 금액) -->
+                <!-- 카드 하단 총계 요약 바 -->
                 <div class="px-4 py-3 bg-stone-50 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span id="tableFooterInfo" class="text-stone-500 font-medium whitespace-nowrap">총 0개 품목 (0건) 조회됨</span>
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 ml-auto">
@@ -498,7 +494,6 @@
             </div>
 
             <div class="p-5 space-y-4">
-                <!-- 기본 발주일자 & 선택 거래처 -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200/80">
                     <div>
                         <label class="block text-xs font-semibold text-stone-600 mb-1">기본 발주일자 (파일명 날짜 자동인식)</label>
@@ -510,13 +505,11 @@
                     </div>
                 </div>
 
-                <!-- 업로드 방식 탭 -->
                 <div class="flex gap-1 bg-stone-100 p-1 rounded-lg">
                     <button id="tabUploadFile" onclick="switchUploadTab('FILE')" class="flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition">엑셀/CSV 파일 업로드</button>
                     <button id="tabUploadPaste" onclick="switchUploadTab('PASTE')" class="flex-1 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:text-stone-800 transition">엑셀 표 복사 · 붙여넣기</button>
                 </div>
 
-                <!-- 탭 1: 파일 드래그 앤 드롭 -->
                 <div id="uploadFilePanel">
                     <label for="excelFileInput" id="dropZone"
                         class="flex flex-col items-center justify-center border-2 border-dashed border-stone-300 hover:border-stone-500 bg-stone-50/70 hover:bg-stone-100/60 rounded-xl p-8 text-center cursor-pointer transition">
@@ -529,7 +522,6 @@
                     </label>
                 </div>
 
-                <!-- 탭 2: 엑셀 영역 붙여넣기 -->
                 <div id="uploadPastePanel" class="hidden space-y-2.5">
                     <textarea id="pasteTextarea" rows="6" placeholder="엑셀에서 발주 표 영역을 복사(Ctrl+C)한 뒤 이곳에 붙여넣기(Ctrl+V) 해주세요."
                         class="w-full p-3 rounded-xl border border-stone-300 text-xs font-mono focus:outline-none focus:border-stone-600"></textarea>
@@ -557,7 +549,6 @@
             <form onsubmit="submitEditOrder(event)" class="p-5 space-y-3.5 text-xs">
                 <input type="hidden" id="editOrderId">
 
-                <!-- 선택 품목 요약 -->
                 <div class="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-1">
                     <div class="flex items-center justify-between text-xs text-stone-500">
                         <span id="editOrderDateInfo">-</span>
@@ -566,14 +557,12 @@
                     <div id="editOrderItemName" class="font-extrabold text-stone-900 text-sm sm:text-base">-</div>
                 </div>
 
-                <!-- 분류 / 거래처 수정 -->
                 <div>
                     <label class="block text-xs font-semibold text-stone-600 mb-1">분류 / 거래처명</label>
                     <input type="text" id="editColAInput" placeholder="거래처명 입력"
                         class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs sm:text-sm font-medium text-stone-800 focus:outline-none focus:border-stone-600">
                 </div>
 
-                <!-- 수량 변경 영역 -->
                 <div class="grid grid-cols-2 gap-3 bg-blue-50/50 border border-blue-200/80 rounded-xl p-3">
                     <div>
                         <span class="block text-[11px] font-semibold text-stone-500 mb-1">기존 발주 수량</span>
@@ -586,96 +575,132 @@
                     </div>
                 </div>
 
-                <!-- 과세구분 및 변경 금액 -->
                 <div class="grid grid-cols-3 gap-2.5">
                     <div>
                         <label class="block text-xs font-semibold text-stone-600 mb-1">과세 구분</label>
-                        <select id="editTaxType" class="w-full px-2.5 py-2 rounded-lg border border-stone-300 bg-white text-xs font-semibold">
+                        <select id="editTaxType" class="w-full px-2.5 py-2 rounded-lg border border-stone-300 bg-white text-xs font-semibold focus:outline-none focus:border-stone-600">
                             <option value="과세">과세</option>
                             <option value="면세">면세</option>
                         </select>
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs font-semibold text-stone-600 mb-1">변경 발주 금액 (원)</label>
+                        <label class="block text-xs font-semibold text-amber-700 mb-1">변경 발주 금액 (공급가, 원)</label>
                         <input type="number" step="any" min="0" id="editNewAmount" required
-                            class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white font-bold text-stone-900 text-xs sm:text-sm focus:outline-none">
+                            class="w-full px-3 py-2 rounded-lg border border-amber-300 bg-amber-50/30 font-bold text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
-                <!-- 비고(사유) 입력 + 빠른 태그 -->
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="text-xs font-semibold text-stone-600">비고 (환불 / 수량 변경 사유)</label>
-                        <div class="flex gap-1">
-                            <button type="button" onclick="appendEditReason('품절 환불')" class="px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 text-[10px] font-semibold hover:bg-red-100">+품절 환불</button>
-                            <button type="button" onclick="appendEditReason('불량 환불')" class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold hover:bg-amber-100">+불량 환불</button>
-                            <button type="button" onclick="appendEditReason('수량 정정')" class="px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200 text-[10px] font-semibold hover:bg-stone-200">+수량 정정</button>
+                        <label class="block text-xs font-semibold text-stone-600">비고 (정정/환불 사유)</label>
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="appendEditReason('전량환불')" class="px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] text-stone-600 font-medium">전량환불</button>
+                            <button type="button" onclick="appendEditReason('일부반품')" class="px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] text-stone-600 font-medium">일부반품</button>
+                            <button type="button" onclick="appendEditReason('수량정정')" class="px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-[10px] text-stone-600 font-medium">수량정정</button>
                         </div>
                     </div>
                     <input type="text" id="editRemarkInput" placeholder=""
-                        class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs focus:outline-none focus:border-stone-600">
+                        class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs text-stone-800 focus:outline-none focus:border-stone-600">
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeEditOrderModal()" class="px-3.5 py-2 rounded-lg border border-stone-200 text-stone-600 font-semibold hover:bg-stone-50">취소</button>
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-[#18242C] text-[#DFC082] font-bold hover:bg-stone-800 transition">수정 내용 저장</button>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeEditOrderModal()" class="px-4 py-2 rounded-lg border border-stone-200 text-xs font-semibold text-stone-600 hover:bg-stone-50">
+                        취소
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-[#18242C] text-[#DFC082] text-xs font-bold hover:bg-stone-800 transition">
+                        수정 내용 저장
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 모달 3: 내 구글 스프레드시트 실시간 연동 설정 팝업 (2번 항목 제거 완료) -->
+    <!-- 모달 3: 내 구글 스프레드시트 실시간 연동 설정 & DB 정밀 점검 팝업 -->
     <div id="gsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
-        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-lg overflow-hidden">
-            <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 shrink-0">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="cloud" class="w-4 h-4 text-emerald-600"></i>
-                    <h2 class="text-sm sm:text-base font-bold text-stone-800">내 구글 스프레드시트 실시간 연동 설정</h2>
+                    <i data-lucide="database" class="w-4 h-4 text-emerald-600"></i>
+                    <h2 class="text-sm sm:text-base font-bold text-stone-800">원재료 발주 DB (구글 시트) 연동 및 정밀 점검</h2>
                 </div>
                 <button onclick="closeGsModal()" class="p-1 rounded-lg text-stone-400 hover:text-stone-700">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <div class="p-5 space-y-4 text-xs">
+            <div class="p-5 space-y-4 text-xs overflow-y-auto">
                 <div>
-                    <label class="block font-bold text-stone-700 mb-1.5">Google Apps Script 웹 앱 URL (입력 즉시 자동 저장 · 1시간 주기 자동 동기화)</label>
+                    <div class="flex items-center justify-between mb-1.5 gap-2">
+                        <label class="font-bold text-stone-700">Google Apps Script 웹 앱 URL (시트 단일 원본 모드 · 로컬 캐시 미사용)</label>
+                        <button type="button" onclick="resetToDefaultGsUrl()" class="text-[11px] font-semibold text-blue-700 hover:underline shrink-0">기본 DB 주소 복원</button>
+                    </div>
                     <input type="url" id="gsUrlInput" oninput="onGsUrlInputAutoSave(this.value)"
                         placeholder="https://script.google.com/macros/s/.../exec"
                         class="w-full px-3 py-2.5 rounded-xl border border-stone-300 bg-stone-50 focus:bg-white font-mono text-xs focus:outline-none focus:border-emerald-600">
                 </div>
 
                 <!-- 실시간 연동 원인 자동 진단 패널 -->
-                <div id="gsDiagnosticBox" class="p-3.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-600 space-y-1">
+                <div id="gsDiagnosticBox" class="p-3.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-600 space-y-1.5">
                     <p class="font-bold text-stone-700">연동 상태 진단 대기 중</p>
-                    <p class="text-[11px] text-stone-500">웹 앱 URL을 입력하고 아래 [연동 테스트 및 불러오기] 버튼을 클릭하세요.</p>
+                    <p class="text-[11px] text-stone-500">아래 [DB 읽기·쓰기 정밀 점검] 버튼을 누르면 실제 구글 시트에 데이터가 저장·조회되는지 왕복 검증합니다.</p>
+                </div>
+
+                <!-- 서버 실제 응답 원문 확인 박스 -->
+                <div id="gsRawPreviewWrap" class="hidden rounded-xl border border-stone-200 bg-stone-900 text-stone-100 p-3 space-y-1">
+                    <div class="flex items-center justify-between text-[11px] text-stone-400">
+                        <span class="font-bold text-[#DFC082]">실제 원재료 발주 DB 응답 로그</span>
+                        <span id="gsRawMetaInfo">-</span>
+                    </div>
+                    <pre id="gsRawPreviewText" class="text-[11px] font-mono whitespace-pre-wrap break-all max-h-32 overflow-y-auto text-emerald-300"></pre>
                 </div>
 
                 <!-- 액션 버튼들 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button onclick="runDeepDbDiagnostics()" class="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="stethoscope" class="w-3.5 h-3.5"></i>
+                        DB 읽기·쓰기 정밀 점검
+                    </button>
                     <button onclick="saveGsUrlAndSync()" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center justify-center gap-1.5">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                        연동 테스트 및 불러오기
+                        시트에서 다시 불러오기
                     </button>
                     <button onclick="downloadEmbeddedHtmlWithUrl()" class="py-2.5 px-3 rounded-xl bg-[#18242C] hover:bg-stone-800 text-[#DFC082] font-bold transition flex items-center justify-center gap-1.5">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                        현재 URL 고정된 HTML 다운로드
+                        고정 index.html 저장
                     </button>
                 </div>
 
+                <!-- Apps Script 점검/교체용 표준 코드 아코디언 -->
+                <details class="rounded-xl border border-stone-200 bg-stone-50/80 p-3">
+                    <summary class="cursor-pointer font-bold text-stone-700 flex items-center justify-between select-none">
+                        <span>점검 결과 저장이 안 될 때: 원재료 발주 DB 표준 Apps Script 코드 확인</span>
+                        <span class="text-[11px] text-blue-600 font-semibold">펼치기</span>
+                    </summary>
+                    <div class="mt-3 space-y-2 text-[11px] text-stone-600 leading-relaxed">
+                        <p>1. 원재료 발주 구글 시트 상단 메뉴 <strong>[확장 프로그램 → Apps Script]</strong>를 엽니다.</p>
+                        <p>2. 아래 표준 코드를 붙여넣고 저장(Ctrl+S)한 뒤, 우측 상단 <strong>[배포 → 배포 관리 → 펜 아이콘(수정) → 버전: 새 버전 → 배포]</strong>를 누르면 기존 웹앱 URL 그대로 즉시 정상 작동합니다.</p>
+                        <div class="flex justify-end">
+                            <button type="button" onclick="copyStandardGasCode()" class="px-2.5 py-1 rounded-lg bg-stone-800 text-white font-bold hover:bg-stone-700 transition">
+                                표준 Apps Script 코드 복사
+                            </button>
+                        </div>
+                        <pre id="standardGasCodeBlock" class="p-2.5 rounded-lg bg-stone-900 text-stone-100 font-mono text-[10px] overflow-x-auto max-h-44"></pre>
+                    </div>
+                </details>
+
                 <div class="pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
-                    <button onclick="syncAllOrdersToSheet(true)" class="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i> 현재 대시보드 데이터를 시트에 덮어쓰기
+                    <button onclick="clearLocalCacheAndReloadFromDb()" class="text-xs font-semibold text-stone-600 hover:text-stone-900 hover:underline flex items-center gap-1">
+                        <i data-lucide="eraser" class="w-3.5 h-3.5"></i> PC 브라우저 캐시 비우고 시트 원본만 다시 읽기
                     </button>
                     <button onclick="confirmClearAllData()" class="text-xs font-semibold text-red-600 hover:underline flex items-center gap-1">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 전체 데이터 비우기
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> DB 전체 데이터 비우기
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 모달 4: 커스텀 확인 모달 (confirm 대체) -->
+    <!-- 모달 4: 커스텀 확인 모달 -->
     <div id="confirmModal" class="fixed inset-0 z-[90] hidden items-center justify-center bg-black/45 p-4">
         <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-sm p-5 space-y-4">
             <div class="flex items-start gap-3">
@@ -694,26 +719,151 @@
         </div>
     </div>
 
+    <!-- 모달 5: 동일 품목 금액(단가) 변동 감지 알림 모달 -->
+    <div id="priceAlertModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-amber-50/70">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm sm:text-base font-extrabold text-stone-900">동일 상품 금액(단가) 변동 알림</h2>
+                        <p class="text-[11px] text-stone-500">직전 발주 내역과 동일한 원재료명 기준으로 수량 대비 단가(금액)가 변동된 품목입니다.</p>
+                    </div>
+                </div>
+                <button onclick="closePriceAlertModal()" class="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200/60">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="px-5 py-3 bg-stone-50 border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1 bg-stone-200/70 p-1 rounded-lg">
+                    <button id="btnPriceTabUpload" onclick="switchPriceAlertTab('UPLOAD')" class="hidden px-3 py-1 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition">
+                        방금 등록한 발주서 (0)
+                    </button>
+                    <button id="btnPriceTabPeriod" onclick="switchPriceAlertTab('PERIOD')" class="px-3 py-1 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition">
+                        현재 조회기간 변동 내역 (0)
+                    </button>
+                </div>
+                <div id="priceAlertSummaryBadges" class="flex items-center gap-2 text-xs"></div>
+            </div>
+
+            <div class="p-4 overflow-y-auto flex-1 bg-stone-100/50">
+                <div id="priceAlertListContainer"></div>
+            </div>
+
+            <div class="px-5 py-3 bg-white border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-500">
+                <span>※ 발주 수량이 달라도 1단위당 기준 단가(발주금액 ÷ 수량)가 동일한 경우는 제외됩니다.</span>
+                <button onclick="closePriceAlertModal()" class="px-4 py-1.5 rounded-lg bg-[#18242C] text-[#DFC082] text-xs font-bold hover:bg-stone-800 transition shrink-0">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // =========================================================================
         // 전역 설정 및 상태 관리
         // =========================================================================
-        const DEFAULT_GAS_URL = ""; // [현재 URL 고정된 HTML 다운로드] 시 자동 주입되는 영역
+        const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzqTAsUMN5PCkwpniHkLXYngHeoZkQ-3Ngk3tQ9_j90jalloUZ2uHN2_QI9C_CwSuOs/exec";
         const STORAGE_KEY_ORDERS = "baroga_raw_material_orders_v1";
-        const STORAGE_KEY_GAS_URL = "baroga_gas_webapp_url_v1";
+        const STORAGE_KEY_GAS_URL = "baroga_gas_webapp_url_v4";
+        const STORAGE_KEY_GAS_SYNC_ACTION = "baroga_gas_sync_action_v4";
+        const STORAGE_KEY_GAS_CLEAR_ACTION = "baroga_gas_clear_action_v4";
         const AUTO_SYNC_INTERVAL_MS = 60 * 60 * 1000; // 1시간 주기 자동 동기화
 
-        const _nowInit = new Date();
-        let selectedYear = String(_nowInit.getFullYear());
-        let currentPeriod = `${selectedYear}-${String(_nowInit.getMonth() + 1).padStart(2, '0')}`;
-        let currentTaxFilter = 'ALL';       // 'ALL' | '면세' | '과세'
-        let currentVendorFilter = 'ALL';    // 'ALL' | '__UNASSIGNED__' | 거래처명
-        let currentViewTab = 'HISTORY';     // 'HISTORY' | 'VENDOR' | 'SUMMARY'
-        let currentChartMode = 'TOP_ITEMS'; // 'TOP_ITEMS' | 'TOP_AMOUNT' | 'TOP_VENDORS' | 'MONTHLY_TREND'
+        // 원재료 발주 DB 표준 Google Apps Script
+        const STANDARD_GAS_CODE = `const SHEET_NAME = '원재료발주DB';
+const HEADERS = ['id', 'date', 'colA', 'colB', 'colC', 'colD', 'prevQty', 'taxType', 'taxFreeAmount', 'taxableAmount', 'amount', 'colE'];
+
+function getTargetSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(HEADERS);
+  }
+  return { ss, sheet };
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  const { ss, sheet } = getTargetSheet();
+  const lastRow = sheet.getLastRow();
+  const orders = [];
+  if (lastRow >= 2) {
+    const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
+    const tz = ss.getSpreadsheetTimeZone() || 'Asia/Seoul';
+    values.forEach(r => {
+      if (!r[0] && !r[3]) return;
+      const d = (r[1] instanceof Date) ? Utilities.formatDate(r[1], tz, 'yyyy-MM-dd') : String(r[1] || '');
+      orders.push({
+        id: String(r[0] || ''), date: d, colA: String(r[2] || ''), colB: String(r[3] || ''),
+        colC: String(r[4] || ''), colD: Number(r[5] || 0), prevQty: r[6] === '' ? '' : Number(r[6]),
+        taxType: String(r[7] || '과세'), taxFreeAmount: Number(r[8] || 0),
+        taxableAmount: Number(r[9] || 0), amount: Number(r[10] || 0), colE: String(r[11] || '')
+      });
+    });
+  }
+  return jsonOut({ ok: true, spreadsheetName: ss.getName(), sheetName: sheet.getName(), count: orders.length, orders });
+}
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(15000);
+  try {
+    const { ss, sheet } = getTargetSheet();
+    const body = e && e.postData && e.postData.contents ? JSON.parse(e.postData.contents) : {};
+    const action = body.action || (e && e.parameter && e.parameter.action) || '';
+    const list = Array.isArray(body.orders) ? body.orders : (Array.isArray(body.data) ? body.data : []);
+    const toRow = o => [
+      o.id || '', String(o.date || ''), o.colA || '', o.colB || '', o.colC || '',
+      Number(o.colD || 0), (o.prevQty === '' || o.prevQty === null || o.prevQty === undefined) ? '' : Number(o.prevQty),
+      o.taxType || '과세', Number(o.taxFreeAmount || 0), Number(o.taxableAmount || 0), Number(o.amount || 0), o.colE || ''
+    ];
+
+    if (action === 'appendOrders') {
+      if (list.length > 0) {
+        const rows = list.map(toRow);
+        sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, HEADERS.length).setValues(rows);
+      }
+    } else if (action === 'syncAll' || action === 'replaceAll' || action === 'clearAll') {
+      const lastRow = sheet.getLastRow();
+      if (lastRow >= 2) sheet.getRange(2, 1, lastRow - 1, sheet.getMaxColumns()).clearContent();
+      sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+      if (action !== 'clearAll' && list.length > 0) {
+        const rows = list.map(toRow);
+        sheet.getRange(2, 1, rows.length, HEADERS.length).setValues(rows);
+      }
+    } else {
+      return jsonOut({ ok: false, error: 'Unsupported action: ' + action });
+    }
+    SpreadsheetApp.flush();
+    const finalCount = Math.max(0, sheet.getLastRow() - 1);
+    return jsonOut({ ok: true, action, count: finalCount, spreadsheetName: ss.getName(), sheetName: sheet.getName() });
+  } catch (err) {
+    return jsonOut({ ok: false, error: String(err) });
+  } finally {
+    lock.releaseLock();
+  }
+}`;
+
+        const _nowDate = new Date();
+        let selectedYear = String(_nowDate.getFullYear());
+        let currentPeriod = `${_nowDate.getFullYear()}-${String(_nowDate.getMonth() + 1).padStart(2, '0')}`;
+        let currentTaxFilter = 'ALL';
+        let currentVendorFilter = 'ALL';
+        let currentViewTab = 'HISTORY';
+        let currentChartMode = 'TOP_ITEMS';
 
         let ordersData = [];
         let gasWebAppUrl = "";
         let isSyncingSheet = false;
+        let activeWritePromise = null;
         let lastSyncTimestamp = 0;
         let autoSyncTimer = null;
 
@@ -722,6 +872,10 @@
         let collapsedVendorCards = new Set();
         let pendingConfirmAction = null;
         let editUnitPriceSnapshot = 0;
+
+        let priceChangeById = new Map();
+        let lastUploadPriceChanges = [];
+        let currentPriceAlertTab = 'PERIOD';
 
         // =========================================================================
         // 유틸리티 & 정규화 함수
@@ -750,7 +904,6 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // 모든 날짜 문자열/객체를 YYYY-MM-DD 단일 양식으로 통일 (단건입력·엑셀·시트 카드 병합 보장)
         function normalizeDateStr(raw) {
             if (!raw && raw !== 0) return getTodayStr();
             if (raw instanceof Date && !isNaN(raw.getTime())) {
@@ -759,7 +912,6 @@
             const s = String(raw).trim();
             if (!s) return getTodayStr();
 
-            // 이미 YYYY-MM-DD 시작이거나 ISO 문자열(UTC 시간대 시차 보정 포함)
             if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
                 const dt = new Date(s);
                 if (!isNaN(dt.getTime())) {
@@ -770,25 +922,21 @@
                 }
             }
 
-            // YYYY. M. D. / YYYY/MM/DD / YYYY-M-D / YYYY년 M월 D일
             const sepMatch = s.match(/^(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})/);
             if (sepMatch) {
                 return `${sepMatch[1]}-${sepMatch[2].padStart(2, '0')}-${sepMatch[3].padStart(2, '0')}`;
             }
 
-            // MM/DD/YYYY (미국 로케일 시트 날짜)
             const mdyMatch = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](20\d{2})$/);
             if (mdyMatch) {
                 return `${mdyMatch[3]}-${mdyMatch[1].padStart(2, '0')}-${mdyMatch[2].padStart(2, '0')}`;
             }
 
-            // YY. M. D / YY-MM-DD
             const shortSep = s.match(/^(\d{2})\s*[-./]\s*(\d{1,2})\s*[-./]\s*(\d{1,2})\.?$/);
             if (shortSep) {
                 return `20${shortSep[1]}-${shortSep[2].padStart(2, '0')}-${shortSep[3].padStart(2, '0')}`;
             }
 
-            // Apps Script Date.toString() 영문 포맷 대응 (예: "Mon Nov 09 00:00:00 KST 2026")
             const engMonths = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
             const engMatch = s.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})\b.*?\b(20\d{2})\b/i);
             if (engMatch) {
@@ -796,15 +944,12 @@
                 return `${engMatch[3]}-${mm}-${engMatch[2].padStart(2, '0')}`;
             }
 
-            // YYYYMMDD (8자리)
             const m8 = s.match(/^(\d{4})(\d{2})(\d{2})$/);
             if (m8) return `${m8[1]}-${m8[2]}-${m8[3]}`;
 
-            // YYMMDD (6자리)
             const m6 = s.match(/^(\d{2})(\d{2})(\d{2})$/);
             if (m6) return `20${m6[1]}-${m6[2]}-${m6[3]}`;
 
-            // 엑셀/시트 시리얼 넘버 형태인 경우
             if (/^\d{5}(\.0+)?$/.test(s)) {
                 const serial = Math.floor(parseFloat(s));
                 if (serial > 40000 && serial < 60000) {
@@ -834,7 +979,6 @@
             return isNaN(dt.getTime()) ? '' : `${days[dt.getDay()]}요일`;
         }
 
-        // 비고란에서 파일명 흔적(.xlsx, .csv, 원재료 발주서 등)을 제거해 항상 공란 유지
         function sanitizeRemark(rawRemark) {
             const r = String(rawRemark ?? '').trim();
             if (!r || r === '-') return '';
@@ -843,7 +987,6 @@
             return r;
         }
 
-        // 고유 ID 내에 이전 수량(prevQty) 메타데이터 인코딩/디코딩 (구글 시트 열 변경 없이도 취소선 수량 보존)
         function extractPrevQtyFromId(idStr) {
             const m = String(idStr || '').match(/__pq_([0-9.]+)$/);
             return m ? parseFloat(m[1]) : null;
@@ -922,7 +1065,6 @@
             }, 2800);
         }
 
-        // 커스텀 확인창
         function openConfirmModal(title, message, onConfirm) {
             document.getElementById('confirmModalTitle').textContent = title;
             document.getElementById('confirmModalMessage').textContent = message;
@@ -948,7 +1090,16 @@
         // =========================================================================
         // 로컬 저장소 & 연도/월/거래처 컨트롤
         // =========================================================================
+        function isCloudDbMode() {
+            return Boolean(String(gasWebAppUrl || DEFAULT_GAS_URL || '').trim());
+        }
+
         function loadLocalData() {
+            if (isCloudDbMode()) {
+                try { localStorage.removeItem(STORAGE_KEY_ORDERS); } catch (e) {}
+                ordersData = [];
+                return;
+            }
             try {
                 const raw = localStorage.getItem(STORAGE_KEY_ORDERS);
                 if (raw) {
@@ -963,6 +1114,10 @@
         }
 
         function saveData() {
+            if (isCloudDbMode()) {
+                try { localStorage.removeItem(STORAGE_KEY_ORDERS); } catch (e) {}
+                return;
+            }
             try {
                 localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(ordersData));
             } catch (e) {
@@ -1025,7 +1180,6 @@
             }
             container.innerHTML = html;
 
-            // 현재 선택된 월 버튼이 보이도록 스크롤 정렬
             if (currentPeriod !== 'ALL') {
                 const activeMm = currentPeriod.split('-')[1];
                 setTimeout(() => {
@@ -1073,7 +1227,6 @@
             renderDashboard();
         }
 
-        // 거래처명 정규화 & 거래처 필터 옵션 갱신
         function getNormalizedVendorName(colAVal) {
             const trimmed = String(colAVal || '').trim();
             return (!trimmed || trimmed === '-') ? '거래처 미지정' : trimmed;
@@ -1135,7 +1288,6 @@
             return raw === currentVendorFilter;
         }
 
-        // 탭 전환 & 차트 모드 전환
         function switchViewTab(tab) {
             currentViewTab = tab;
             const btnHistory = document.getElementById('tabBtnHistory');
@@ -1198,9 +1350,236 @@
         }
 
         // =========================================================================
+        // 동일 원재료명 금액(단가) 변동 감지 및 알림 모달 제어
+        // =========================================================================
+        function normalizeProductKey(name) {
+            return String(name || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        }
+
+        function computeAllPriceChanges() {
+            priceChangeById = new Map();
+            if (!Array.isArray(ordersData) || ordersData.length === 0) return;
+
+            const chronological = ordersData
+                .map((item, idx) => ({ item, idx }))
+                .sort((a, b) => {
+                    const dCmp = String(a.item.date || '').localeCompare(String(b.item.date || ''));
+                    return dCmp !== 0 ? dCmp : a.idx - b.idx;
+                });
+
+            const latestByProduct = new Map();
+
+            chronological.forEach(({ item }) => {
+                const key = normalizeProductKey(item.colB);
+                const qty = Number(item.colD || 0);
+                const amt = Number(item.amount || 0);
+                if (!key || qty <= 0 || amt <= 0) return;
+
+                const unitPrice = amt / qty;
+
+                if (latestByProduct.has(key)) {
+                    const prev = latestByProduct.get(key);
+                    const diffUnit = unitPrice - prev.unitPrice;
+
+                    if (Math.abs(diffUnit) >= 1) {
+                        const diffRate = prev.unitPrice > 0 ? (diffUnit / prev.unitPrice) * 100 : 0;
+                        priceChangeById.set(item.id, {
+                            orderId: item.id,
+                            colB: item.colB,
+                            colA: item.colA || prev.colA || '-',
+                            colC: item.colC || prev.colC || '-',
+                            prevSpec: prev.colC || '-',
+                            prevDate: prev.date,
+                            newDate: item.date,
+                            prevQty: prev.qty,
+                            newQty: qty,
+                            prevAmount: prev.amount,
+                            newAmount: amt,
+                            prevUnitPrice: prev.unitPrice,
+                            newUnitPrice: unitPrice,
+                            diffUnit,
+                            diffRate,
+                            direction: diffUnit > 0 ? 'UP' : 'DOWN'
+                        });
+                    }
+                }
+
+                latestByProduct.set(key, {
+                    id: item.id,
+                    date: item.date,
+                    colA: item.colA,
+                    colC: item.colC,
+                    qty,
+                    amount: amt,
+                    unitPrice
+                });
+            });
+        }
+
+        function getFilteredPeriodPriceChanges() {
+            const query = ((document.getElementById('searchInput') || {}).value || '').trim().toLowerCase();
+            const list = [];
+
+            ordersData.forEach(o => {
+                if (!priceChangeById.has(o.id)) return;
+                if (currentPeriod !== 'ALL' && (!o.date || !o.date.startsWith(currentPeriod))) return;
+                if (!matchesVendorFilter(o)) return;
+                if (currentTaxFilter === '면세' && o.taxType !== '면세' && !(o.taxFreeAmount > 0)) return;
+                if (currentTaxFilter === '과세' && o.taxType !== '과세' && !(o.taxableAmount > 0)) return;
+                if (query) {
+                    const hay = `${o.colA} ${o.colB} ${o.colC} ${o.colE} ${o.date}`.toLowerCase();
+                    if (!hay.includes(query)) return;
+                }
+                list.push(priceChangeById.get(o.id));
+            });
+
+            return list.sort((a, b) => String(b.newDate || '').localeCompare(String(a.newDate || '')));
+        }
+
+        function openPriceAlertModal(mode = 'PERIOD') {
+            computeAllPriceChanges();
+            if (mode === 'UPLOAD' && lastUploadPriceChanges.length > 0) {
+                currentPriceAlertTab = 'UPLOAD';
+            } else {
+                currentPriceAlertTab = 'PERIOD';
+            }
+            renderPriceAlertModalContent();
+            const modal = document.getElementById('priceAlertModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closePriceAlertModal() {
+            const modal = document.getElementById('priceAlertModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function switchPriceAlertTab(tab) {
+            currentPriceAlertTab = tab;
+            renderPriceAlertModalContent();
+            lucide.createIcons();
+        }
+
+        function renderPriceAlertModalContent() {
+            const btnUpload = document.getElementById('btnPriceTabUpload');
+            const btnPeriod = document.getElementById('btnPriceTabPeriod');
+            const summaryBox = document.getElementById('priceAlertSummaryBadges');
+            const container = document.getElementById('priceAlertListContainer');
+            if (!container) return;
+
+            const periodChanges = getFilteredPeriodPriceChanges();
+            const hasUploadList = lastUploadPriceChanges.length > 0;
+
+            if (btnUpload) {
+                btnUpload.classList.toggle('hidden', !hasUploadList);
+                btnUpload.textContent = `방금 등록한 발주서 (${lastUploadPriceChanges.length})`;
+                btnUpload.className = (hasUploadList ? '' : 'hidden ') + (
+                    currentPriceAlertTab === 'UPLOAD'
+                        ? 'px-3 py-1 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition'
+                        : 'px-3 py-1 rounded-md text-xs font-medium text-stone-600 hover:text-stone-900 transition'
+                );
+            }
+            if (btnPeriod) {
+                btnPeriod.textContent = `현재 조회기간 변동 내역 (${periodChanges.length})`;
+                btnPeriod.className = currentPriceAlertTab === 'PERIOD'
+                    ? 'px-3 py-1 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition'
+                    : 'px-3 py-1 rounded-md text-xs font-medium text-stone-600 hover:text-stone-900 transition';
+            }
+
+            const targetList = currentPriceAlertTab === 'UPLOAD' ? lastUploadPriceChanges : periodChanges;
+            const upCount = targetList.filter(c => c.direction === 'UP').length;
+            const downCount = targetList.filter(c => c.direction === 'DOWN').length;
+
+            if (summaryBox) {
+                summaryBox.innerHTML = `
+                    <span class="px-2 py-0.5 rounded bg-stone-200/80 text-stone-800 font-bold">총 ${targetList.length}건</span>
+                    <span class="px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-200 font-bold">▲ 인상 ${upCount}건</span>
+                    <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">▼ 인하 ${downCount}건</span>
+                `;
+            }
+
+            if (targetList.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-xl border border-stone-200 py-12 px-4 text-center space-y-2">
+                        <div class="w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-sm font-bold text-stone-700">감지된 금액(단가) 변동 품목이 없습니다</p>
+                        <p class="text-xs text-stone-400">선택된 조회 조건 내 모든 동일 원재료가 직전 발주 단가와 동일합니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="bg-white rounded-xl border border-stone-200 overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-200 bg-stone-50 text-[11px] font-semibold text-stone-500 whitespace-nowrap">
+                                <th class="py-2.5 px-3">발주일자 (직전 → 신규)</th>
+                                <th class="py-2.5 px-3">거래처</th>
+                                <th class="py-2.5 px-3">원재료명 / 규격</th>
+                                <th class="py-2.5 px-3 text-right">이전 단가 (총액/수량)</th>
+                                <th class="py-2.5 px-3 text-right">변동 단가 (총액/수량)</th>
+                                <th class="py-2.5 px-3 text-right">변동폭</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100 text-xs">
+                            ${targetList.map(c => {
+                                const isUp = c.direction === 'UP';
+                                const sign = isUp ? '+' : '';
+                                const rateStr = `${sign}${c.diffRate.toFixed(1)}%`;
+                                const specChanged = c.prevSpec !== c.colC && c.prevSpec !== '-' && c.colC !== '-';
+
+                                return `
+                                    <tr class="hover:bg-stone-50/80 transition whitespace-nowrap">
+                                        <td class="py-2.5 px-3 font-mono text-[11px] text-stone-600">
+                                            <span class="text-stone-400">${escapeHtml(c.prevDate)}</span>
+                                            <span class="mx-1 text-stone-300">→</span>
+                                            <strong class="text-stone-900">${escapeHtml(c.newDate)}</strong>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-stone-600 font-medium">${escapeHtml(c.colA)}</td>
+                                        <td class="py-2.5 px-3">
+                                            <div class="font-bold text-stone-900">${escapeHtml(c.colB)}</div>
+                                            <div class="text-[11px] text-stone-400">
+                                                ${specChanged
+                                                    ? `<span class="text-amber-700 font-semibold">규격변경: ${escapeHtml(c.prevSpec)} → ${escapeHtml(c.colC)}</span>`
+                                                    : escapeHtml(c.colC)}
+                                            </div>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-right">
+                                            <div class="font-semibold text-stone-600">${formatNumber(Math.round(c.prevUnitPrice))}원</div>
+                                            <div class="text-[10px] text-stone-400">${formatNumber(Math.round(c.prevAmount))}원 / ${formatNumber(c.prevQty)}</div>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-right">
+                                            <div class="font-extrabold ${isUp ? 'text-red-600' : 'text-blue-700'}">${formatNumber(Math.round(c.newUnitPrice))}원</div>
+                                            <div class="text-[10px] text-stone-400">${formatNumber(Math.round(c.newAmount))}원 / ${formatNumber(c.newQty)}</div>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-right">
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md font-extrabold text-[11px] border ${
+                                                isUp
+                                                    ? 'bg-red-50 text-red-600 border-red-200'
+                                                    : 'bg-blue-50 text-blue-700 border-blue-200'
+                                            }">
+                                                ${isUp ? '▲' : '▼'} ${sign}${formatNumber(Math.round(c.diffUnit))}원 (${rateStr})
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // =========================================================================
         // 메인 대시보드 집계 및 렌더링
         // =========================================================================
         function renderDashboard() {
+            computeAllPriceChanges();
             updateVendorFilterOptions();
 
             const searchInput = document.getElementById('searchInput');
@@ -1208,7 +1587,6 @@
             const clearBtn = document.getElementById('clearSearchBtn');
             if (clearBtn) clearBtn.classList.toggle('hidden', !query);
 
-            // 1. 기간 / 거래처 / 과세구분 / 검색어 필터링
             const filteredOrders = ordersData.filter(o => {
                 if (currentPeriod !== 'ALL') {
                     if (!o.date || !o.date.startsWith(currentPeriod)) return false;
@@ -1226,7 +1604,6 @@
                 return true;
             });
 
-            // 2. 품목별 & 거래처별 집계
             const summaryMap = new Map();
             const vendorMap = new Map();
             const orderDateSet = new Set();
@@ -1255,7 +1632,6 @@
                 totalTaxable += tx;
                 totalAmt += itemAmt;
 
-                // 원재료별 누적 집계
                 const itemKey = `${(o.colB || '').trim()}||${(o.colC || '').trim()}`;
                 if (!summaryMap.has(itemKey)) {
                     summaryMap.set(itemKey, {
@@ -1279,7 +1655,6 @@
                 sItem.totalAmount += itemAmt;
                 sItem.count += 1;
 
-                // 거래처별 누적 집계
                 const rawVendor = String(o.colA || '').trim();
                 const isUnassigned = !rawVendor || rawVendor === '-';
                 const vendorName = isUnassigned ? '거래처 미지정' : rawVendor;
@@ -1330,7 +1705,6 @@
                 }
             });
 
-            // 원재료별 리스트 변환 및 정렬
             const sortMode = (document.getElementById('sortSelect') || {}).value || 'QTY_DESC';
             const summaryList = Array.from(summaryMap.values()).map(it => {
                 const taxType = (it.taxFreeAmount > 0 && it.taxableAmount > 0)
@@ -1353,7 +1727,6 @@
                 return b.totalQty - a.totalQty;
             });
 
-            // 거래처별 리스트 변환 및 정렬
             const vendorSortMode = (document.getElementById('vendorSortSelect') || {}).value || 'AMT_DESC';
             const vendorList = Array.from(vendorMap.values()).map(vg => {
                 const items = Array.from(vg.itemsMap.values()).map(vi => ({
@@ -1388,7 +1761,6 @@
                 return b.totalAmount - a.totalAmount;
             });
 
-            // 3. 상단 KPI 업데이트
             const totalOrderCount = orderDateSet.size;
             const totalVatAmt = totalAmt + (totalTaxable * 0.1);
             const periodLabel = currentPeriod === 'ALL'
@@ -1411,7 +1783,6 @@
             document.getElementById('kpiTaxableAmt').textContent = `${formatNumber(Math.round(totalTaxable))}원`;
             document.getElementById('kpiTaxableSub').textContent = `전체 ${txRatio}% · 부가세 ${formatNumber(Math.round(totalTaxable * 0.1))}원`;
 
-            // 4. 하단 푸터 바 업데이트
             document.getElementById('tableFooterInfo').textContent =
                 currentViewTab === 'VENDOR'
                     ? `총 ${vendorList.length}곳 거래처 · ${summaryList.length}개 품목 (${filteredOrders.length}건)`
@@ -1422,7 +1793,13 @@
             document.getElementById('tableFooterTotalAmt').textContent = `${formatNumber(Math.round(totalAmt))}원`;
             document.getElementById('tableFooterVatAmt').textContent = `${formatNumber(Math.round(totalVatAmt))}원`;
 
-            // 5. 각 뷰 및 차트 렌더링
+            const periodPriceChangeCount = filteredOrders.reduce((acc, o) => acc + (priceChangeById.has(o.id) ? 1 : 0), 0);
+            const alertBadge = document.getElementById('priceAlertCountBadge');
+            if (alertBadge) {
+                alertBadge.textContent = String(periodPriceChangeCount);
+                alertBadge.classList.toggle('hidden', periodPriceChangeCount === 0);
+            }
+
             renderHistoryCards(filteredOrders);
             renderVendorCards(vendorList);
             renderSummaryTable(summaryList);
@@ -1514,7 +1891,6 @@
                 return;
             }
 
-            // 날짜별 그룹화 (정규화된 YYYY-MM-DD 기준)
             const groupedMap = new Map();
             filteredOrders.forEach(item => {
                 const dKey = normalizeDateStr(item.date);
@@ -1547,7 +1923,6 @@
 
                 return `
                     <div class="bg-white rounded-xl border border-stone-200 shadow-2xs overflow-hidden">
-                        <!-- 일자별 카드 상단 요약 헤더 -->
                         <div onclick="toggleDateCard('${escapeHtml(dateKey)}')" class="px-4 py-3 bg-white hover:bg-stone-50/80 border-b border-stone-100 flex flex-wrap items-center justify-between gap-2.5 cursor-pointer select-none transition">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2.5 py-1 rounded-lg bg-[#18242C] text-[#DFC082] text-xs sm:text-sm font-extrabold font-mono tracking-tight">
@@ -1591,7 +1966,6 @@
                             </div>
                         </div>
 
-                        <!-- 일자별 품목 상세 테이블 (줄바꿈 방지 및 비고 수기 입력) -->
                         <div class="${isCollapsed ? 'hidden' : 'block'} overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
@@ -1617,6 +1991,19 @@
                                                </span>`
                                             : `<span class="font-extrabold text-blue-700">${formatNumber(row.colD)}</span>`;
 
+                                        const pChange = priceChangeById.get(row.id);
+                                        const priceChangeBadge = pChange
+                                            ? `<button type="button" onclick="openPriceAlertModal('PERIOD')"
+                                                    title="직전(${escapeHtml(pChange.prevDate)}) 단가 ${formatNumber(Math.round(pChange.prevUnitPrice))}원 → ${formatNumber(Math.round(pChange.newUnitPrice))}원 (${pChange.diffUnit > 0 ? '+' : ''}${formatNumber(Math.round(pChange.diffUnit))}원)"
+                                                    class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold border transition ${
+                                                        pChange.direction === 'UP'
+                                                            ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+                                                            : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                                    }">
+                                                    ${pChange.direction === 'UP' ? '▲' : '▼'} ${pChange.diffUnit > 0 ? '+' : ''}${pChange.diffRate.toFixed(1)}%
+                                               </button>`
+                                            : '';
+
                                         return `
                                             <tr class="hover:bg-stone-50/80 transition whitespace-nowrap ${Number(row.colD) === 0 && hasModifiedQty ? 'bg-red-50/20' : ''}">
                                                 <td class="py-2 px-2.5 text-center text-[11px] text-stone-400 font-mono">${idx + 1}</td>
@@ -1625,7 +2012,7 @@
                                                 <td class="py-2 px-2 text-stone-500">${escapeHtml(row.colC || '-')}</td>
                                                 <td class="py-2 px-2 text-center">${getTaxBadgeHtml(row.taxType)}</td>
                                                 <td class="py-2 px-2.5 text-right bg-blue-50/20">${qtyHtml}</td>
-                                                <td class="py-2 px-2.5 text-right bg-amber-50/20 font-bold text-stone-800">${formatNumber(Math.round(row.amount || 0))}원</td>
+                                                <td class="py-2 px-2.5 text-right bg-amber-50/20 font-bold text-stone-800">${formatNumber(Math.round(row.amount || 0))}원${priceChangeBadge}</td>
                                                 <td class="py-1.5 px-2">
                                                     <input type="text" value="${escapeHtml(row.colE || '')}" placeholder=""
                                                         onkeydown="if(event.key==='Enter'){this.blur();}"
@@ -1829,7 +2216,7 @@
         }
 
         // =========================================================================
-        // 4) 차트 시각화 (수량TOP / 금액TOP / 거래처TOP / 상위 10개 품목 월별 추이)
+        // 4) 차트 시각화
         // =========================================================================
         function updateChart(summaryList, filteredOrders, vendorList = []) {
             const canvas = document.getElementById('orderChart');
@@ -1942,7 +2329,6 @@
                     }
                 });
             } else {
-                // 선택 연도 기준 상위 10개 품목 월별 발주금액 변동 추이 (꺾은선 그래프)
                 document.getElementById('chartTitle').textContent = `${selectedYear}년 월별 발주금액 추이`;
                 const labels = Array.from({ length: 12 }, (_, idx) => `${idx + 1}월`);
                 const query = ((document.getElementById('searchInput') || {}).value || '').trim().toLowerCase();
@@ -2120,20 +2506,68 @@
             if (!Array.isArray(rows) || rows.length === 0) return [];
 
             let headerRowIdx = -1;
+            let subHeaderRowIdx = -1;
             let detectedDocVendor = defaultVendor;
             const colMap = {
                 colA: 0,
                 colB: 1,
                 colC: 2,
-                colD: 3, // 기본 4번째 열(D열) 수량
+                colD: 3,
                 taxTypeCol: -1,
                 taxFreeCol: -1,
                 taxableCol: -1,
                 unitPriceCol: -1,
-                totalAmtCol: -1
+                supplyAmtCol: -1,
+                totalAmtCol: -1,
+                vatCols: new Set()
             };
 
-            // 상단 20행 내에서 헤더 행 탐색 및 상단 거래처 메타 텍스트 탐색
+            const applyHeaderMapping = (row) => {
+                row.forEach((cell, idx) => {
+                    const h = String(cell || '').replace(/\s+/g, '');
+                    if (!h) return;
+                    const hLower = h.toLowerCase();
+
+                    const isVatIncludedHeader = h.includes('포함') || h.includes('합계금액') || h.includes('총합계');
+                    if (!isVatIncludedHeader && (h.includes('부가세') || h.includes('부가가치세') || h.includes('세액') || hLower === 'vat')) {
+                        colMap.vatCols.add(idx);
+                        return;
+                    }
+
+                    if (h.includes('거래처') || h.includes('발주처') || h.includes('매입처') || h.includes('공급처') || h.includes('업체명')) {
+                        colMap.colA = idx;
+                    } else if ((h.includes('분류') || h.includes('카테고리')) && idx < 3) {
+                        colMap.colA = idx;
+                    }
+                    if (h.includes('품명') || h.includes('품목명') || h.includes('원재료명') || h === '품목' || h === '원재료' || h === '상품명') {
+                        colMap.colB = idx;
+                    }
+                    if (h.includes('규격') || h.includes('단위') || h.includes('용량') || h.includes('포장')) {
+                        colMap.colC = idx;
+                    }
+                    if (h.includes('발주수량') || h.includes('주문수량') || h.includes('입고수량') || h.includes('발주량') || h === '수량') {
+                        colMap.colD = idx;
+                    }
+                    if (h.includes('과세구분') || h.includes('면과세') || (h === '구분' && idx > 3)) {
+                        colMap.taxTypeCol = idx;
+                    }
+                    if (h.includes('면세') && !h.includes('과세')) {
+                        colMap.taxFreeCol = idx;
+                    }
+                    if (h.includes('과세') && !h.includes('면세') && !h.includes('구분')) {
+                        colMap.taxableCol = idx;
+                    }
+                    if (h.includes('단가')) {
+                        colMap.unitPriceCol = idx;
+                    }
+                    if (h.includes('공급가') || h.includes('공급금액') || h.includes('발주금액') || h.includes('발주액') || h.includes('매입금액') || h.includes('주문금액') || h === '금액') {
+                        colMap.supplyAmtCol = idx;
+                    } else if (h.includes('합계') || h.includes('총액') || h.includes('총금액') || isVatIncludedHeader) {
+                        colMap.totalAmtCol = idx;
+                    }
+                });
+            };
+
             for (let r = 0; r < Math.min(rows.length, 20); r++) {
                 const row = rows[r] || [];
                 const joined = row.map(c => String(c || '').trim()).join(' ');
@@ -2149,44 +2583,22 @@
                 const hasQtyHeader = row.some(c => /수량|발주량|주문량|입고량/.test(String(c || '')));
                 if (hasItemHeader || (hasQtyHeader && r < 12)) {
                     headerRowIdx = r;
-                    row.forEach((cell, idx) => {
-                        const h = String(cell || '').replace(/\s+/g, '');
-                        if (!h) return;
-                        if (h.includes('거래처') || h.includes('발주처') || h.includes('매입처') || h.includes('공급처') || h.includes('업체명')) {
-                            colMap.colA = idx;
-                        } else if ((h.includes('분류') || h.includes('카테고리')) && idx < 3) {
-                            colMap.colA = idx;
+                    applyHeaderMapping(row);
+
+                    if (r + 1 < rows.length) {
+                        const nextRow = rows[r + 1] || [];
+                        const nextQty = parseNumeric(nextRow[colMap.colD]);
+                        const hasSubHeaderKeyword = nextRow.some(c => /공급가|부가세|세액|단가|발주금액|면세|과세/.test(String(c || '')));
+                        if (nextQty <= 0 && hasSubHeaderKeyword) {
+                            subHeaderRowIdx = r + 1;
+                            applyHeaderMapping(nextRow);
                         }
-                        if (h.includes('품명') || h.includes('품목명') || h.includes('원재료명') || h === '품목' || h === '원재료') {
-                            colMap.colB = idx;
-                        }
-                        if (h.includes('규격') || h.includes('단위') || h.includes('용량') || h.includes('포장')) {
-                            colMap.colC = idx;
-                        }
-                        if (h.includes('발주수량') || h.includes('주문수량') || h.includes('발주량') || h === '수량') {
-                            colMap.colD = idx;
-                        }
-                        if (h.includes('과세구분') || h.includes('면과세') || (h === '구분' && idx > 3)) {
-                            colMap.taxTypeCol = idx;
-                        }
-                        if (h.includes('면세') && !h.includes('과세')) {
-                            colMap.taxFreeCol = idx;
-                        }
-                        if (h.includes('과세') && !h.includes('면세') && !h.includes('구분')) {
-                            colMap.taxableCol = idx;
-                        }
-                        if (h.includes('단가')) {
-                            colMap.unitPriceCol = idx;
-                        }
-                        if (h.includes('합계') || h.includes('발주금액') || h.includes('공급가액') || h === '금액') {
-                            colMap.totalAmtCol = idx;
-                        }
-                    });
+                    }
                     break;
                 }
             }
 
-            const startIdx = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
+            const startIdx = subHeaderRowIdx >= 0 ? subHeaderRowIdx + 1 : (headerRowIdx >= 0 ? headerRowIdx + 1 : 0);
             const result = [];
             const normalizedDate = normalizeDateStr(targetDate);
 
@@ -2198,7 +2610,6 @@
                 const rawA = String(row[colMap.colA] ?? '').trim();
                 const joinedRow = row.map(c => String(c || '')).join('');
 
-                // 합계/소계 행 제외
                 if (/합\s*계|소\s*계|총\s*계|부가세|총발주/.test(joinedRow) && (/합\s*계|소\s*계|총\s*계/.test(rawB) || /합\s*계|소\s*계|총\s*계/.test(rawA) || !rawB)) {
                     continue;
                 }
@@ -2207,7 +2618,6 @@
                 if (!rawB || qty <= 0) continue;
                 if (/^(품명|품목명|원재료명)$/.test(rawB.replace(/\s+/g, ''))) continue;
 
-                // colA가 단순 일련번호(1, 2, 3...)인 경우 상단/기본 거래처명 사용
                 let vendorOrCat = rawA;
                 if (/^\d+$/.test(vendorOrCat)) {
                     vendorOrCat = detectedDocVendor || '';
@@ -2217,23 +2627,70 @@
 
                 const spec = String(row[colMap.colC] ?? '').trim();
 
-                let taxFreeAmt = colMap.taxFreeCol >= 0 ? parseNumeric(row[colMap.taxFreeCol]) : 0;
-                let taxableAmt = colMap.taxableCol >= 0 ? parseNumeric(row[colMap.taxableCol]) : 0;
-                let totalAmt = colMap.totalAmtCol >= 0 ? parseNumeric(row[colMap.totalAmtCol]) : 0;
+                let taxFreeAmt = (colMap.taxFreeCol >= 0 && !colMap.vatCols.has(colMap.taxFreeCol)) ? parseNumeric(row[colMap.taxFreeCol]) : 0;
+                let taxableAmt = (colMap.taxableCol >= 0 && !colMap.vatCols.has(colMap.taxableCol)) ? parseNumeric(row[colMap.taxableCol]) : 0;
+                const supplyAmt = (colMap.supplyAmtCol >= 0 && !colMap.vatCols.has(colMap.supplyAmtCol)) ? parseNumeric(row[colMap.supplyAmtCol]) : 0;
+                const grossAmt = (colMap.totalAmtCol >= 0 && !colMap.vatCols.has(colMap.totalAmtCol)) ? parseNumeric(row[colMap.totalAmtCol]) : 0;
                 const unitPrice = colMap.unitPriceCol >= 0 ? parseNumeric(row[colMap.unitPriceCol]) : 0;
 
-                // 헤더 없는 양식에서 우측 금액열 보조 탐색
-                if (taxFreeAmt === 0 && taxableAmt === 0 && totalAmt === 0 && unitPrice === 0 && row.length > 4) {
-                    for (let c = 4; c < row.length; c++) {
-                        const cellStr = String(row[c] ?? '').trim();
-                        if (cellStr === '면세' || cellStr === '과세') continue;
-                        const v = parseNumeric(cellStr);
-                        if (v >= 100) totalAmt = v;
+                let rowVatAmt = 0;
+                colMap.vatCols.forEach(vIdx => {
+                    rowVatAmt += parseNumeric(row[vIdx]);
+                });
+
+                let totalAmt = 0;
+                if (supplyAmt > 0) {
+                    totalAmt = supplyAmt;
+                } else if (grossAmt > 0) {
+                    if (rowVatAmt > 0 && grossAmt > rowVatAmt && Math.abs((grossAmt - rowVatAmt) * 0.1 - rowVatAmt) <= Math.max(10, grossAmt * 0.01)) {
+                        totalAmt = grossAmt - rowVatAmt;
+                    } else {
+                        totalAmt = grossAmt;
                     }
                 }
 
                 if (totalAmt === 0 && taxFreeAmt === 0 && taxableAmt === 0 && unitPrice > 0) {
                     totalAmt = unitPrice * qty;
+                }
+
+                if (taxFreeAmt === 0 && taxableAmt === 0 && totalAmt === 0 && row.length > 4) {
+                    const numCandidates = [];
+                    for (let c = Math.max(4, colMap.colD + 1); c < row.length; c++) {
+                        if (colMap.vatCols.has(c) || c === colMap.taxTypeCol) continue;
+                        const cellStr = String(row[c] ?? '').trim();
+                        if (!cellStr || cellStr === '면세' || cellStr === '과세') continue;
+                        const v = parseNumeric(cellStr);
+                        if (v >= 100) numCandidates.push({ col: c, val: v });
+                    }
+
+                    if (numCandidates.length === 1) {
+                        totalAmt = numCandidates[0].val;
+                    } else if (numCandidates.length >= 2) {
+                        let matchedSupply = 0;
+                        for (let i = 0; i < numCandidates.length; i++) {
+                            for (let j = 0; j < numCandidates.length; j++) {
+                                if (i === j) continue;
+                                if (qty > 1 && Math.abs(numCandidates[i].val * qty - numCandidates[j].val) <= 5) {
+                                    matchedSupply = numCandidates[j].val;
+                                    break;
+                                }
+                            }
+                            if (matchedSupply > 0) break;
+                        }
+
+                        if (matchedSupply > 0) {
+                            totalAmt = matchedSupply;
+                        } else {
+                            const filtered = numCandidates.filter((cand, idx) => {
+                                if (idx === 0) return true;
+                                const prevVal = numCandidates[idx - 1].val;
+                                const isTenPercentVat = Math.abs(cand.val - prevVal * 0.1) <= Math.max(10, prevVal * 0.01);
+                                const isVatSum = idx >= 2 && Math.abs(cand.val - (numCandidates[idx - 2].val + prevVal)) <= 5;
+                                return !isTenPercentVat && !isVatSum;
+                            });
+                            totalAmt = filtered[filtered.length - 1].val;
+                        }
+                    }
                 }
 
                 let taxType = '과세';
@@ -2264,7 +2721,7 @@
                     taxFreeAmount: taxFreeAmt,
                     taxableAmount: taxableAmt,
                     amount: totalAmt,
-                    colE: '' // 비고 항상 공란
+                    colE: ''
                 }));
             }
 
@@ -2275,7 +2732,6 @@
             ordersData = ordersData.concat(newOrders);
             saveData();
 
-            // 업로드된 발주일자의 연/월로 즉시 포커싱
             if (newOrders[0] && newOrders[0].date) {
                 const ym = newOrders[0].date.substring(0, 7);
                 selectedYear = ym.substring(0, 4);
@@ -2284,7 +2740,18 @@
 
             initYearAndMonthControls();
             renderDashboard();
-            showToast(`${newOrders.length}건의 원재료 발주 내역이 반영되었습니다.`, 'success');
+
+            const detectedChanges = newOrders
+                .map(o => priceChangeById.get(o.id))
+                .filter(Boolean);
+
+            if (detectedChanges.length > 0) {
+                lastUploadPriceChanges = detectedChanges;
+                openPriceAlertModal('UPLOAD');
+                showToast(`${newOrders.length}건 반영 완료 · 금액 변동 ${detectedChanges.length}건 감지!`, 'info');
+            } else {
+                showToast(`${newOrders.length}건의 원재료 발주 내역이 반영되었습니다.`, 'success');
+            }
 
             if (gasWebAppUrl) {
                 appendOrdersToSheet(newOrders);
@@ -2297,16 +2764,16 @@
         function handleQuickAdd(event) {
             event.preventDefault();
             const dateVal = normalizeDateStr(document.getElementById('quickDate').value || getTodayStr());
-            const colA = document.getElementById('quickColA').value.trim();
-            const colB = document.getElementById('quickColB').value.trim();
-            const colC = document.getElementById('quickColC').value.trim();
+            const colA = String(document.getElementById('quickColA').value || '').trim();
+            const colB = String(document.getElementById('quickColB').value || '').trim();
+            const colC = String(document.getElementById('quickColC').value || '').trim();
             const colD = parseNumeric(document.getElementById('quickColD').value);
             const taxType = document.getElementById('quickTaxType').value || '과세';
             const amt = parseNumeric(document.getElementById('quickAmount').value);
-            const colE = document.getElementById('quickColE').value.trim();
+            const colE = sanitizeRemark(document.getElementById('quickColE').value);
 
-            if (!colB) {
-                showToast('원재료명을 입력해 주세요.', 'error');
+            if (!colB || colD <= 0) {
+                showToast('원재료명과 입고수량을 정확히 입력해 주세요.', 'error');
                 return;
             }
 
@@ -2327,8 +2794,10 @@
             ordersData.push(newItem);
             saveData();
 
-            selectedYear = newItem.date.substring(0, 4);
-            currentPeriod = newItem.date.substring(0, 7);
+            const ym = newItem.date.substring(0, 7);
+            selectedYear = ym.substring(0, 4);
+            currentPeriod = ym;
+
             initYearAndMonthControls();
             renderDashboard();
 
@@ -2338,21 +2807,28 @@
             document.getElementById('quickAmount').value = '';
             document.getElementById('quickColE').value = '';
 
-            showToast(`'${colB}' 품목이 ${newItem.date} 발주 내역에 추가되었습니다.`, 'success');
+            const singleChange = priceChangeById.get(newItem.id);
+            if (singleChange) {
+                lastUploadPriceChanges = [singleChange];
+                openPriceAlertModal('UPLOAD');
+                showToast(`'${colB}' 추가 완료 · 직전 발주 대비 금액 변동이 감지되었습니다.`, 'info');
+            } else {
+                showToast(`'${colB}' 품목이 ${newItem.date} 발주 내역에 추가되었습니다.`, 'success');
+            }
+
             if (gasWebAppUrl) {
                 appendOrdersToSheet([newItem]);
             }
         }
 
         function updateInlineRemark(orderId, newVal) {
-            const idx = ordersData.findIndex(o => o.id === orderId);
-            if (idx === -1) return;
-            const trimmed = String(newVal || '').trim();
-            if ((ordersData[idx].colE || '') === trimmed) return;
-
-            ordersData[idx].colE = trimmed;
+            const target = ordersData.find(o => o.id === orderId);
+            if (!target) return;
+            const cleaned = String(newVal ?? '').trim();
+            if ((target.colE || '') === cleaned) return;
+            target.colE = cleaned;
             saveData();
-            showToast('비고 내용이 저장되었습니다.', 'info');
+            showToast('비고 내용이 저장되었습니다.', 'success');
             if (gasWebAppUrl) {
                 syncAllOrdersToSheet(false);
             }
@@ -2362,30 +2838,29 @@
             const target = ordersData.find(o => o.id === orderId);
             if (!target) return;
 
-            const basePrevQty = (target.prevQty !== null && target.prevQty !== undefined)
+            const baseQty = (target.prevQty !== null && target.prevQty !== undefined)
                 ? Number(target.prevQty)
                 : Number(target.colD || 0);
 
             editUnitPriceSnapshot = Number(target.colD) > 0
                 ? (Number(target.amount || 0) / Number(target.colD))
-                : (basePrevQty > 0 ? Number(target.amount || 0) / basePrevQty : 0);
+                : (baseQty > 0 ? (Number(target.amount || 0) / baseQty) : 0);
 
             document.getElementById('editOrderId').value = target.id;
-            document.getElementById('editOrderDateInfo').textContent = `발주일자: ${target.date || '-'}`;
-            document.getElementById('editOrderSpecInfo').textContent = target.colC || '-';
-            document.getElementById('editOrderItemName').textContent = target.colB || '-';
+            document.getElementById('editOrderDateInfo').textContent = `발주일: ${target.date}`;
+            document.getElementById('editOrderSpecInfo').textContent = target.colC ? `규격: ${target.colC}` : '';
+            document.getElementById('editOrderItemName').textContent = target.colB;
             document.getElementById('editColAInput').value = target.colA || '';
-
-            document.getElementById('editPrevQtyDisplay').textContent = formatNumber(basePrevQty);
-            document.getElementById('editPrevQtyDisplay').dataset.basePrev = String(basePrevQty);
+            document.getElementById('editPrevQtyDisplay').textContent = formatNumber(baseQty);
             document.getElementById('editNewQtyInput').value = target.colD;
             document.getElementById('editTaxType').value = target.taxType === '면세' ? '면세' : '과세';
-            document.getElementById('editNewAmount').value = Math.round(Number(target.amount || 0));
+            document.getElementById('editNewAmount').value = Math.round(target.amount || 0);
             document.getElementById('editRemarkInput').value = target.colE || '';
 
             const modal = document.getElementById('editOrderModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
         }
 
         function closeEditOrderModal() {
@@ -2395,19 +2870,22 @@
         }
 
         function onEditQtyInputChange() {
-            const newQty = parseFloat(document.getElementById('editNewQtyInput').value || '0');
-            if (!isNaN(newQty) && newQty >= 0 && editUnitPriceSnapshot > 0) {
+            const newQty = parseNumeric(document.getElementById('editNewQtyInput').value);
+            if (editUnitPriceSnapshot > 0 && newQty >= 0) {
                 document.getElementById('editNewAmount').value = Math.round(newQty * editUnitPriceSnapshot);
             } else if (newQty === 0) {
                 document.getElementById('editNewAmount').value = 0;
             }
         }
 
-        function appendEditReason(reason) {
-            const inp = document.getElementById('editRemarkInput');
-            const cur = inp.value.trim();
-            if (!cur) inp.value = reason;
-            else if (!cur.includes(reason)) inp.value = `${cur}, ${reason}`;
+        function appendEditReason(reasonText) {
+            const input = document.getElementById('editRemarkInput');
+            const cur = input.value.trim();
+            if (!cur) {
+                input.value = reasonText;
+            } else if (!cur.includes(reasonText)) {
+                input.value = `${cur}, ${reasonText}`;
+            }
         }
 
         function submitEditOrder(event) {
@@ -2417,34 +2895,36 @@
             if (idx === -1) return;
 
             const target = ordersData[idx];
-            const basePrev = parseFloat(document.getElementById('editPrevQtyDisplay').dataset.basePrev || String(target.colD));
-            const newQtyRaw = parseFloat(document.getElementById('editNewQtyInput').value || '0');
-            const newQty = isNaN(newQtyRaw) || newQtyRaw < 0 ? 0 : newQtyRaw;
-            const finalPrevQty = Number(newQty) !== Number(basePrev) ? basePrev : null;
+            const originalOrderQty = (target.prevQty !== null && target.prevQty !== undefined)
+                ? Number(target.prevQty)
+                : Number(target.colD || 0);
 
-            const taxType = document.getElementById('editTaxType').value || '과세';
-            const newAmtRaw = parseFloat(document.getElementById('editNewAmount').value || '0');
-            const newAmt = isNaN(newAmtRaw) || newAmtRaw < 0 ? 0 : newAmtRaw;
-            const newColA = document.getElementById('editColAInput').value.trim();
-            const newRemark = document.getElementById('editRemarkInput').value.trim();
+            const newColA = String(document.getElementById('editColAInput').value || '').trim();
+            const newQty = parseNumeric(document.getElementById('editNewQtyInput').value);
+            const newTaxType = document.getElementById('editTaxType').value || '과세';
+            const newAmt = parseNumeric(document.getElementById('editNewAmount').value);
+            const newRemark = String(document.getElementById('editRemarkInput').value || '').trim();
 
-            ordersData[idx] = normalizeOrderItem({
+            const nextPrevQty = (newQty !== originalOrderQty) ? originalOrderQty : null;
+
+            ordersData[idx] = {
                 ...target,
-                id: buildOrderIdWithPrevQty(target.id, finalPrevQty, newQty),
+                id: buildOrderIdWithPrevQty(target.id, nextPrevQty, newQty),
                 colA: newColA,
                 colD: newQty,
-                prevQty: finalPrevQty,
-                taxType,
-                taxFreeAmount: taxType === '면세' ? newAmt : 0,
-                taxableAmount: taxType === '과세' ? newAmt : 0,
+                prevQty: nextPrevQty,
+                taxType: newTaxType,
+                taxFreeAmount: newTaxType === '면세' ? newAmt : 0,
+                taxableAmount: newTaxType === '과세' ? newAmt : 0,
                 amount: newAmt,
                 colE: newRemark
-            });
+            };
 
             saveData();
             closeEditOrderModal();
+            initYearAndMonthControls();
             renderDashboard();
-            showToast('품목 수량 및 발주 정보가 수정되었습니다.', 'success');
+            showToast('발주 정보가 수정되었습니다.', 'success');
 
             if (gasWebAppUrl) {
                 syncAllOrdersToSheet(false);
@@ -2455,8 +2935,8 @@
             const target = ordersData.find(o => o.id === orderId);
             if (!target) return;
             openConfirmModal(
-                '발주 품목 삭제',
-                `'${target.colB}' (${target.date}) 내역을 삭제하시겠습니까?`,
+                '품목 삭제',
+                `'${target.colB}' (${target.date}) 발주 내역을 삭제하시겠습니까?`,
                 () => {
                     ordersData = ordersData.filter(o => o.id !== orderId);
                     saveData();
@@ -2469,16 +2949,17 @@
         }
 
         function deleteDateGroup(dateKey) {
-            const count = ordersData.filter(o => normalizeDateStr(o.date) === dateKey).length;
+            const normDate = normalizeDateStr(dateKey);
+            const count = ordersData.filter(o => normalizeDateStr(o.date) === normDate).length;
             openConfirmModal(
-                `${dateKey} 일자 전체 삭제`,
-                `${dateKey}에 등록된 발주 내역 ${count}건을 모두 삭제하시겠습니까?`,
+                '일자 전체 삭제',
+                `${normDate} 일자의 발주 내역 ${count}건을 모두 삭제하시겠습니까?`,
                 () => {
-                    ordersData = ordersData.filter(o => normalizeDateStr(o.date) !== dateKey);
+                    ordersData = ordersData.filter(o => normalizeDateStr(o.date) !== normDate);
                     saveData();
                     initYearAndMonthControls();
                     renderDashboard();
-                    showToast(`${dateKey} 발주 내역이 삭제되었습니다.`, 'info');
+                    showToast(`${normDate} 발주 내역이 삭제되었습니다.`, 'info');
                     if (gasWebAppUrl) syncAllOrdersToSheet(false);
                 }
             );
@@ -2486,25 +2967,33 @@
 
         function confirmClearAllData() {
             openConfirmModal(
-                '전체 발주 데이터 초기화',
-                '현재 대시보드에 저장된 모든 발주 내역을 비우시겠습니까?',
-                () => {
+                '전체 데이터 초기화',
+                '대시보드에 저장된 모든 발주 데이터를 비우시겠습니까? (연동된 구글 시트에도 즉시 반영됩니다)',
+                async () => {
                     ordersData = [];
+                    lastUploadPriceChanges = [];
+                    priceChangeById = new Map();
+                    collapsedDateCards.clear();
+                    collapsedVendorCards.clear();
                     saveData();
                     initYearAndMonthControls();
                     renderDashboard();
                     closeGsModal();
-                    showToast('대시보드 데이터가 모두 비워졌습니다.', 'info');
+                    if (gasWebAppUrl) {
+                        await syncAllOrdersToSheet(true);
+                    } else {
+                        showToast('모든 발주 데이터가 초기화되었습니다.', 'info');
+                    }
                 }
             );
         }
 
         // =========================================================================
-        // CSV 내보내기 (발주수량 / 입고수량 분리 및 부가세 포함 금액 반영)
+        // CSV 내보내기
         // =========================================================================
         function exportSummaryCSV() {
             const query = ((document.getElementById('searchInput') || {}).value || '').trim().toLowerCase();
-            const targetOrders = ordersData.filter(o => {
+            const filtered = ordersData.filter(o => {
                 if (currentPeriod !== 'ALL' && (!o.date || !o.date.startsWith(currentPeriod))) return false;
                 if (!matchesVendorFilter(o)) return false;
                 if (currentTaxFilter === '면세' && o.taxType !== '면세' && !(o.taxFreeAmount > 0)) return false;
@@ -2514,125 +3003,125 @@
                     if (!hay.includes(query)) return false;
                 }
                 return true;
-            });
+            }).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
 
-            if (targetOrders.length === 0) {
+            if (filtered.length === 0) {
                 showToast('내보낼 발주 데이터가 없습니다.', 'error');
                 return;
             }
 
-            const headers = ['발주일자', '분류/거래처', '원재료명', '규격/단위', '과세구분', '발주수량', '입고수량', '면세금액', '과세금액', '발주금액', '부가세포함금액', '비고'];
-            const csvRows = [headers.join(',')];
+            const headers = [
+                '발주일자', '분류/거래처', '원재료명', '규격/단위', '과세구분',
+                '발주수량', '입고수량', '면세금액', '과세금액', '발주금액', '부가세포함금액', '비고'
+            ];
 
-            targetOrders
-                .slice()
-                .sort((a, b) => b.date.localeCompare(a.date))
-                .forEach(o => {
-                    const orderedQty = (o.prevQty !== null && o.prevQty !== undefined) ? o.prevQty : o.colD;
-                    const receivedQty = o.colD;
-                    const tf = Math.round(Number(o.taxFreeAmount || 0));
-                    const tx = Math.round(Number(o.taxableAmount || 0));
-                    const amt = Math.round(Number(o.amount || 0));
-                    const vatAmt = Math.round(amt + tx * 0.1);
+            const csvEscape = (v) => {
+                const s = String(v ?? '').replace(/"/g, '""');
+                return /[",\n\r]/.test(s) ? `"${s}"` : s;
+            };
 
-                    const cells = [
-                        o.date,
-                        o.colA || '',
-                        o.colB || '',
-                        o.colC || '',
-                        o.taxType || '과세',
-                        orderedQty,
-                        receivedQty,
-                        tf,
-                        tx,
-                        amt,
-                        vatAmt,
-                        o.colE || ''
-                    ].map(v => `"${String(v).replace(/"/g, '""')}"`);
-                    csvRows.push(cells.join(','));
-                });
+            const lines = [headers.join(',')];
+            filtered.forEach(o => {
+                const orderedQty = (o.prevQty !== null && o.prevQty !== undefined) ? o.prevQty : o.colD;
+                const receivedQty = o.colD;
+                const tf = Math.round(Number(o.taxFreeAmount || 0));
+                const tx = Math.round(Number(o.taxableAmount || 0));
+                const amt = Math.round(Number(o.amount || 0));
+                const vatIncluded = Math.round(amt + (tx * 0.1));
 
-            const bom = '\uFEFF';
-            const blob = new Blob([bom + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const label = currentPeriod === 'ALL' ? '전체' : currentPeriod;
-            a.href = url;
-            a.download = `바로가공장_원재료발주내역_${label}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        }
-
-        // =========================================================================
-        // 구글 스프레드시트 실시간 연동 (1시간 주기 자동 동기화 & 원인 진단)
-        // =========================================================================
-        function initGoogleSheetSync() {
-            const savedUrl = (localStorage.getItem(STORAGE_KEY_GAS_URL) || '').trim();
-            gasWebAppUrl = savedUrl || DEFAULT_GAS_URL.trim();
-            if (gasWebAppUrl && !savedUrl) {
-                localStorage.setItem(STORAGE_KEY_GAS_URL, gasWebAppUrl);
-            }
-
-            const urlInput = document.getElementById('gsUrlInput');
-            if (urlInput) urlInput.value = gasWebAppUrl;
-
-            updateGsStatusBadge(gasWebAppUrl ? 'READY' : 'NONE');
-
-            // 1시간 주기 타이머 설정
-            if (autoSyncTimer) clearInterval(autoSyncTimer);
-            autoSyncTimer = setInterval(() => {
-                if (gasWebAppUrl && !isSyncingSheet) {
-                    fetchOrdersFromSheet(false);
-                }
-            }, AUTO_SYNC_INTERVAL_MS);
-
-            // 창 포커스 복귀 시 마지막 동기화로부터 1시간이 지난 경우에만 동기화
-            window.addEventListener('focus', () => {
-                if (gasWebAppUrl && !isSyncingSheet && (Date.now() - lastSyncTimestamp >= AUTO_SYNC_INTERVAL_MS)) {
-                    fetchOrdersFromSheet(false);
-                }
+                lines.push([
+                    csvEscape(o.date),
+                    csvEscape(o.colA || ''),
+                    csvEscape(o.colB || ''),
+                    csvEscape(o.colC || ''),
+                    csvEscape(o.taxType || '과세'),
+                    orderedQty,
+                    receivedQty,
+                    tf,
+                    tx,
+                    amt,
+                    vatIncluded,
+                    csvEscape(o.colE || '')
+                ].join(','));
             });
 
-            if (gasWebAppUrl) {
-                fetchOrdersFromSheet(false);
-            }
+            const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const label = currentPeriod === 'ALL' ? '전체기간' : currentPeriod;
+            a.href = url;
+            a.download = `바로가_원재료발주내역_${label}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('CSV 파일이 다운로드되었습니다.', 'success');
         }
 
-        function updateGsStatusBadge(state, detail = '') {
-            const dot = document.getElementById('gsStatusDot');
-            const txt = document.getElementById('gsStatusText');
-            const icon = document.getElementById('gsSyncIcon');
-            if (!dot || !txt) return;
-
-            if (icon) icon.classList.toggle('animate-spin', state === 'SYNCING');
-
-            if (state === 'NONE') {
-                dot.className = 'w-2 h-2 rounded-full bg-stone-400';
-                txt.textContent = '구글 시트 미연동';
-            } else if (state === 'SYNCING') {
-                dot.className = 'w-2 h-2 rounded-full bg-blue-500 animate-pulse';
-                txt.textContent = '동기화 중...';
-            } else if (state === 'OK') {
-                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                txt.textContent = detail || '자동연동 중';
-            } else if (state === 'ERROR') {
-                dot.className = 'w-2 h-2 rounded-full bg-red-500';
-                txt.textContent = '연동 점검 필요';
-            } else {
-                dot.className = 'w-2 h-2 rounded-full bg-amber-500';
-                txt.textContent = '연동 준비됨';
-            }
-        }
-
+        // =========================================================================
+        // 구글 스프레드시트 실시간 연동 (1시간 주기 자동 동기화 & 진단 기능)
+        // =========================================================================
         function openGsModal() {
-            const inp = document.getElementById('gsUrlInput');
-            if (inp) inp.value = gasWebAppUrl;
-            runGsUrlPrecheck(gasWebAppUrl);
+            document.getElementById('gsUrlInput').value = gasWebAppUrl || '';
+            const codeBlock = document.getElementById('standardGasCodeBlock');
+            if (codeBlock) codeBlock.textContent = STANDARD_GAS_CODE;
+            validateGsUrlFormat(gasWebAppUrl);
             const modal = document.getElementById('gsModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function showRawLog(metaLabel, rawText) {
+            const wrap = document.getElementById('gsRawPreviewWrap');
+            const meta = document.getElementById('gsRawMetaInfo');
+            const pre = document.getElementById('gsRawPreviewText');
+            if (!wrap || !pre) return;
+            wrap.classList.remove('hidden');
+            if (meta) meta.textContent = metaLabel || '';
+            pre.textContent = String(rawText || '').slice(0, 1200);
+        }
+
+        function resetToDefaultGsUrl() {
+            try {
+                localStorage.removeItem(STORAGE_KEY_GAS_URL);
+                localStorage.removeItem('baroga_gas_webapp_url_v1');
+                localStorage.removeItem('baroga_gas_webapp_url_v2');
+                localStorage.removeItem('baroga_gas_webapp_url_v3');
+                localStorage.removeItem(STORAGE_KEY_ORDERS);
+            } catch (e) {}
+            gasWebAppUrl = DEFAULT_GAS_URL;
+            const inp = document.getElementById('gsUrlInput');
+            if (inp) inp.value = gasWebAppUrl;
+            validateGsUrlFormat(gasWebAppUrl);
+            fetchOrdersFromSheet(true);
+        }
+
+        function clearLocalCacheAndReloadFromDb() {
+            try {
+                localStorage.removeItem(STORAGE_KEY_ORDERS);
+                localStorage.removeItem(STORAGE_KEY_GAS_SYNC_ACTION);
+                localStorage.removeItem(STORAGE_KEY_GAS_CLEAR_ACTION);
+            } catch (e) {}
+            ordersData = [];
+            renderDashboard();
+            fetchOrdersFromSheet(true);
+        }
+
+        function copyStandardGasCode() {
+            const ta = document.createElement('textarea');
+            ta.value = STANDARD_GAS_CODE;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast('표준 Apps Script 코드가 클립보드에 복사되었습니다.', 'success');
+            } catch (e) {
+                showToast('복사에 실패했습니다. 코드 영역을 직접 선택해 복사해 주세요.', 'error');
+            }
+            document.body.removeChild(ta);
         }
 
         function closeGsModal() {
@@ -2641,479 +3130,734 @@
             modal.classList.remove('flex');
         }
 
-        function onGsUrlInputAutoSave(val) {
-            gasWebAppUrl = String(val || '').trim();
-            localStorage.setItem(STORAGE_KEY_GAS_URL, gasWebAppUrl);
-            runGsUrlPrecheck(gasWebAppUrl);
-            updateGsStatusBadge(gasWebAppUrl ? 'READY' : 'NONE');
+        function updateGsStatusUI(state, text) {
+            const dot = document.getElementById('gsStatusDot');
+            const label = document.getElementById('gsStatusText');
+            const icon = document.getElementById('gsSyncIcon');
+            if (!dot || !label) return;
+
+            label.textContent = text;
+            if (state === 'CONNECTED') {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                if (icon) icon.classList.remove('animate-spin');
+            } else if (state === 'SYNCING') {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+                if (icon) icon.classList.add('animate-spin');
+            } else if (state === 'ERROR') {
+                dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                if (icon) icon.classList.remove('animate-spin');
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-stone-400';
+                if (icon) icon.classList.remove('animate-spin');
+            }
         }
 
-        function runGsUrlPrecheck(url) {
+        function setGsDiagnostic(level, title, desc) {
             const box = document.getElementById('gsDiagnosticBox');
             if (!box) return;
-            if (!url) {
-                box.className = 'p-3.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-600 space-y-1';
-                box.innerHTML = `<p class="font-bold text-stone-700">웹 앱 URL 미입력</p><p class="text-[11px] text-stone-500">Apps Script 배포 후 발급된 /exec 주소를 입력해 주세요.</p>`;
+            const styles = {
+                ok: 'p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/80 text-emerald-900 space-y-1',
+                warn: 'p-3.5 rounded-xl border border-amber-200 bg-amber-50/80 text-amber-900 space-y-1',
+                err: 'p-3.5 rounded-xl border border-red-200 bg-red-50/80 text-red-900 space-y-1',
+                idle: 'p-3.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-600 space-y-1'
+            };
+            box.className = styles[level] || styles.idle;
+            box.innerHTML = `
+                <p class="font-bold text-xs">${escapeHtml(title)}</p>
+                <p class="text-[11px] opacity-90 leading-relaxed">${escapeHtml(desc)}</p>
+            `;
+        }
+
+        function validateGsUrlFormat(url) {
+            const trimmed = String(url || '').trim();
+            if (!trimmed) {
+                setGsDiagnostic('idle', '웹 앱 URL 미입력', 'Google Apps Script 배포 후 발급된 https://script.google.com/macros/s/.../exec 주소를 입력해 주세요.');
                 return false;
             }
-            if (url.includes('docs.google.com/spreadsheets')) {
-                box.className = 'p-3.5 rounded-xl border border-red-200 bg-red-50 text-red-700 space-y-1';
-                box.innerHTML = `<p class="font-bold">스프레드시트 문서 주소가 입력되었습니다</p><p class="text-[11px]">시트 주소가 아닌 [확장 프로그램 ➔ Apps Script ➔ 배포]에서 발급된 https://script.google.com/macros/s/.../exec 주소를 입력해야 합니다.</p>`;
+            if (trimmed.includes('docs.google.com/spreadsheets')) {
+                setGsDiagnostic('err', '스프레드시트 주소가 입력되었습니다', '시트 주소가 아닌 [확장 프로그램 > Apps Script > 배포 > 웹 앱]의 /exec 주소를 입력해야 합니다.');
                 return false;
             }
-            if (url.endsWith('/dev')) {
-                box.className = 'p-3.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 space-y-1';
-                box.innerHTML = `<p class="font-bold">테스트 배포(/dev) 주소입니다</p><p class="text-[11px]">노션 임베드 환경에서는 차단될 수 있으니 [새 배포] 후 /exec로 끝나는 정식 웹 앱 URL을 사용해 주세요.</p>`;
+            if (trimmed.endsWith('/dev')) {
+                setGsDiagnostic('warn', '테스트 배포(/dev) 주소입니다', '노션 임베드 환경에서는 권한 오류가 발생할 수 있으니 정식 배포(/exec) 주소 사용을 권장합니다.');
+                return true;
+            }
+            if (!trimmed.startsWith('https://script.google.com/macros/s/')) {
+                setGsDiagnostic('warn', 'URL 형식을 확인해 주세요', '일반적인 Google Apps Script 웹 앱 URL(https://script.google.com/macros/s/.../exec)과 다릅니다.');
                 return false;
             }
-            if (!url.startsWith('https://script.google.com/macros/s/')) {
-                box.className = 'p-3.5 rounded-xl border border-red-200 bg-red-50 text-red-700 space-y-1';
-                box.innerHTML = `<p class="font-bold">올바른 Apps Script 웹 앱 URL 형식이 아닙니다</p><p class="text-[11px]">https://script.google.com/macros/s/.../exec 형식인지 확인해 주세요.</p>`;
-                return false;
-            }
-            box.className = 'p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-800 space-y-1';
-            box.innerHTML = `<p class="font-bold">웹 앱 URL 형식 정상 확인됨</p><p class="text-[11px]">자동 저장되었습니다. [연동 테스트 및 불러오기]를 누르면 즉시 데이터를 동기화합니다.</p>`;
+            setGsDiagnostic('ok', '올바른 Apps Script 웹 앱 URL 형식입니다', '[DB 읽기·쓰기 정밀 점검] 또는 [시트에서 다시 불러오기]를 클릭하면 즉시 동기화 상태를 확인합니다.');
             return true;
         }
 
-        function saveGsUrlAndSync() {
-            const val = document.getElementById('gsUrlInput').value.trim();
-            gasWebAppUrl = val;
-            localStorage.setItem(STORAGE_KEY_GAS_URL, gasWebAppUrl);
-            if (!runGsUrlPrecheck(gasWebAppUrl)) {
-                showToast('웹 앱 URL 형식을 확인해 주세요.', 'error');
+        function onGsUrlInputAutoSave(val) {
+            const trimmed = String(val || '').trim();
+            gasWebAppUrl = trimmed;
+            try {
+                if (trimmed) localStorage.setItem(STORAGE_KEY_GAS_URL, trimmed);
+                else localStorage.removeItem(STORAGE_KEY_GAS_URL);
+            } catch (e) {}
+            validateGsUrlFormat(trimmed);
+            if (!trimmed) {
+                updateGsStatusUI('IDLE', '구글 시트 미연동');
+            }
+        }
+
+        async function saveGsUrlAndSync() {
+            const val = String(document.getElementById('gsUrlInput').value || '').trim();
+            onGsUrlInputAutoSave(val);
+            if (!val) {
+                showToast('웹 앱 URL을 먼저 입력해 주세요.', 'error');
                 return;
             }
-            fetchOrdersFromSheet(true);
+            await fetchOrdersFromSheet(true);
         }
 
-        // 객체에서 정확한 키 또는 부분 일치 헤더명으로 값 추출
-        function pickSheetField(obj, exactKeys, partialKeywords = []) {
-            for (const k of exactKeys) {
-                if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
-                    return obj[k];
-                }
+        function initGoogleSheetSync() {
+            let savedUrl = '';
+            try {
+                localStorage.removeItem('baroga_gas_webapp_url_v1');
+                localStorage.removeItem('baroga_gas_webapp_url_v2');
+                localStorage.removeItem('baroga_gas_webapp_url_v3');
+                localStorage.removeItem(STORAGE_KEY_ORDERS);
+                savedUrl = localStorage.getItem(STORAGE_KEY_GAS_URL) || '';
+            } catch (e) {}
+
+            gasWebAppUrl = (savedUrl || DEFAULT_GAS_URL || '').trim();
+            if (gasWebAppUrl) {
+                updateGsStatusUI('SYNCING', 'DB 연결 확인 중...');
+                fetchOrdersFromSheet(false);
+            } else {
+                updateGsStatusUI('IDLE', '구글 시트 미연동');
             }
-            if (partialKeywords.length > 0) {
-                const entries = Object.entries(obj);
-                for (const kw of partialKeywords) {
-                    const kwLower = kw.toLowerCase();
-                    for (const [rawKey, val] of entries) {
-                        const cleanKey = String(rawKey).replace(/\s+/g, '').toLowerCase();
-                        if (cleanKey.includes(kwLower) && val !== undefined && val !== null && val !== '') {
-                            return val;
-                        }
+
+            if (autoSyncTimer) clearInterval(autoSyncTimer);
+            autoSyncTimer = setInterval(() => {
+                if (gasWebAppUrl && !isSyncingSheet && !activeWritePromise) {
+                    fetchOrdersFromSheet(false);
+                }
+            }, AUTO_SYNC_INTERVAL_MS);
+
+            window.addEventListener('focus', () => {
+                if (gasWebAppUrl && !isSyncingSheet && !activeWritePromise && (Date.now() - lastSyncTimestamp >= AUTO_SYNC_INTERVAL_MS)) {
+                    fetchOrdersFromSheet(false);
+                }
+            });
+        }
+
+        function parseSheetRows(payload) {
+            let rawList = null;
+            if (Array.isArray(payload)) {
+                rawList = payload;
+            } else if (payload && typeof payload === 'object') {
+                const candidates = [payload.orders, payload.data, payload.rows, payload.items, payload.values, payload.result];
+                for (const c of candidates) {
+                    if (Array.isArray(c)) {
+                        rawList = c;
+                        break;
                     }
                 }
             }
-            return undefined;
-        }
+            if (!rawList) return null;
+            if (rawList.length === 0) return [];
 
-        // 응답 JSON 구조가 data / orders / rows / items / records / values / 2D 배열 중 무엇이든 추출
-        function extractRowsFromSheetResponse(json) {
-            if (Array.isArray(json)) {
-                return { rows: json, hasExplicitArray: true };
-            }
-            if (!json || typeof json !== 'object') {
-                return { rows: [], hasExplicitArray: false };
-            }
-
-            const candidateKeys = ['data', 'orders', 'rows', 'items', 'records', 'values', 'list', 'result', 'payload'];
-            for (const key of candidateKeys) {
-                const val = json[key];
-                if (Array.isArray(val)) {
-                    if (Array.isArray(json.headers) && val.length > 0 && Array.isArray(val[0])) {
-                        return { rows: [json.headers, ...val], hasExplicitArray: true };
-                    }
-                    return { rows: val, hasExplicitArray: true };
-                }
-                if (val && typeof val === 'object') {
-                    for (const subKey of ['orders', 'rows', 'items', 'data', 'values', 'records']) {
-                        if (Array.isArray(val[subKey])) {
-                            return { rows: val[subKey], hasExplicitArray: true };
-                        }
-                    }
-                }
-            }
-
-            for (const val of Object.values(json)) {
-                if (Array.isArray(val)) {
-                    return { rows: val, hasExplicitArray: true };
-                }
-            }
-
-            return { rows: [], hasExplicitArray: false };
-        }
-
-        function parseSheetRows(rawList) {
-            if (!Array.isArray(rawList) || rawList.length === 0) return [];
-            const parsed = [];
-
-            // 1) 2차원 배열 행 형태 대응 (헤더 행 자동 감지 및 동적 열 매핑)
             if (Array.isArray(rawList[0])) {
-                let startRow = 0;
-                const mapIdx = {
-                    id: 0, date: 1, colA: 2, colB: 3, colC: 4,
-                    prevQty: -1, colD: 5, taxType: 6, taxFree: 7, taxable: 8, amount: 9, colE: 10
+                const firstRowStr = rawList[0].map(v => String(v || '').trim()).join('|');
+                const hasHeader = /일자|날짜|date|원재료|품목|품명|수량|colB/i.test(firstRowStr);
+                const headers = hasHeader ? rawList[0].map(h => String(h || '').replace(/\s+/g, '').toLowerCase()) : [];
+                const dataRows = hasHeader ? rawList.slice(1) : rawList;
+
+                const findIdx = (patterns, fallbackIdx) => {
+                    if (!hasHeader) return fallbackIdx;
+                    const idx = headers.findIndex(h => patterns.some(p => h.includes(p)));
+                    return idx >= 0 ? idx : fallbackIdx;
                 };
 
-                const firstRowStr = rawList[0].map(c => String(c ?? '').trim()).join(' ');
-                if (/발주일자|원재료|품목|품명|발주수량|입고수량|colB|고유ID/i.test(firstRowStr)) {
-                    startRow = 1;
-                    let orderQtyCol = -1;
-                    let recvQtyCol = -1;
+                const idxId = findIdx(['id', '고유번호'], 0);
+                const idxDate = findIdx(['발주일자', '일자', '날짜', 'date'], 1);
+                const idxColA = findIdx(['거래처', '분류', 'cola', 'a열'], 2);
+                const idxColB = findIdx(['원재료', '품목', '품명', '상품명', 'colb', 'b열'], 3);
+                const idxColC = findIdx(['규격', '단위', 'colc', 'c열'], 4);
+                const idxColD = findIdx(['입고수량', '발주수량', '수량', 'cold', 'd열'], 5);
+                const idxPrev = findIdx(['이전수량', '기존수량', 'prevqty'], -1);
+                const idxTaxType = findIdx(['과세구분', '구분', 'taxtype'], 6);
+                const idxTaxFree = findIdx(['면세금액', '면세', 'taxfree'], 7);
+                const idxTaxable = findIdx(['과세금액', '과세공급가', 'taxable'], 8);
+                const idxAmount = findIdx(['발주금액', '합계금액', '총금액', '금액', 'amount'], 9);
+                const idxColE = findIdx(['비고', '사유', 'cole', 'e열'], 10);
 
-                    rawList[0].forEach((cell, idx) => {
-                        const h = String(cell ?? '').replace(/\s+/g, '').toLowerCase();
-                        if (!h) return;
-                        if (h === 'id' || h.includes('고유id') || h.includes('주문id')) mapIdx.id = idx;
-                        else if (h.includes('일자') || h.includes('날짜') || h === 'date') mapIdx.date = idx;
-                        else if (h.includes('거래처') || h.includes('분류') || h.includes('발주처') || h === 'cola') mapIdx.colA = idx;
-                        else if (h.includes('원재료') || h.includes('품목') || h.includes('품명') || h === 'colb') mapIdx.colB = idx;
-                        else if (h.includes('규격') || h.includes('단위') || h === 'colc') mapIdx.colC = idx;
-                        else if (h.includes('이전수량') || h.includes('기존수량') || h === 'prevqty') mapIdx.prevQty = idx;
-                        else if (h.includes('입고수량')) recvQtyCol = idx;
-                        else if (h.includes('발주수량') || h.includes('d열') || h === '수량' || h === 'cold') orderQtyCol = idx;
-                        else if (h.includes('과세구분') || h.includes('면과세') || h === '구분' || h === 'taxtype') mapIdx.taxType = idx;
-                        else if (h.includes('면세') && !h.includes('과세')) mapIdx.taxFree = idx;
-                        else if (h.includes('과세') && !h.includes('면세') && !h.includes('구분')) mapIdx.taxable = idx;
-                        else if (h.includes('총발주금액') || h.includes('발주금액') || h.includes('합계') || h === '금액' || h === 'amount') mapIdx.amount = idx;
-                        else if (h.includes('비고') || h.includes('출처') || h.includes('메모') || h === 'cole') mapIdx.colE = idx;
-                    });
-
-                    if (recvQtyCol >= 0 && orderQtyCol >= 0 && recvQtyCol !== orderQtyCol) {
-                        mapIdx.prevQty = orderQtyCol;
-                        mapIdx.colD = recvQtyCol;
-                    } else if (recvQtyCol >= 0) {
-                        mapIdx.colD = recvQtyCol;
-                    } else if (orderQtyCol >= 0) {
-                        mapIdx.colD = orderQtyCol;
-                    }
-                } else if (rawList[0].length >= 5 && /^\d{4}[-./]\d{1,2}[-./]\d{1,2}/.test(String(rawList[0][0] || '').trim())) {
-                    // 첫 열이 고유ID가 아니라 날짜로 시작하는 시트 구조 대응
-                    mapIdx.id = -1;
-                    mapIdx.date = 0;
-                    mapIdx.colA = 1;
-                    mapIdx.colB = 2;
-                    mapIdx.colC = 3;
-                    mapIdx.colD = 4;
-                    mapIdx.taxType = 5;
-                    mapIdx.taxFree = 6;
-                    mapIdx.taxable = 7;
-                    mapIdx.amount = 8;
-                    mapIdx.colE = 9;
-                }
-
-                for (let r = startRow; r < rawList.length; r++) {
-                    const row = rawList[r];
-                    if (!Array.isArray(row)) continue;
-                    const colBVal = String(row[mapIdx.colB] ?? '').trim();
-                    const qtyVal = parseNumeric(row[mapIdx.colD]);
-                    const amtVal = mapIdx.amount >= 0 ? parseNumeric(row[mapIdx.amount]) : 0;
-                    if (!colBVal && qtyVal === 0 && amtVal === 0) continue;
-                    if (/^(원재료명|품목명|품명)$/.test(colBVal.replace(/\s+/g, ''))) continue;
-
-                    parsed.push(normalizeOrderItem({
-                        id: (mapIdx.id >= 0 && row[mapIdx.id]) ? row[mapIdx.id] : `ord_gs_${r}`,
-                        date: mapIdx.date >= 0 ? row[mapIdx.date] : '',
-                        colA: mapIdx.colA >= 0 ? row[mapIdx.colA] : '',
-                        colB: colBVal || '(미지정 품목)',
-                        colC: mapIdx.colC >= 0 ? row[mapIdx.colC] : '',
-                        colD: qtyVal,
-                        prevQty: mapIdx.prevQty >= 0 ? row[mapIdx.prevQty] : undefined,
-                        taxType: mapIdx.taxType >= 0 ? row[mapIdx.taxType] : '과세',
-                        taxFreeAmount: mapIdx.taxFree >= 0 ? row[mapIdx.taxFree] : 0,
-                        taxableAmount: mapIdx.taxable >= 0 ? row[mapIdx.taxable] : 0,
-                        amount: amtVal,
-                        colE: mapIdx.colE >= 0 ? row[mapIdx.colE] : ''
-                    }));
-                }
-                return parsed;
+                return dataRows
+                    .filter(r => Array.isArray(r) && r.some(cell => String(cell ?? '').trim() !== ''))
+                    .map((r, i) => normalizeOrderItem({
+                        id: r[idxId] || `gs_${i}_${Date.now()}`,
+                        date: r[idxDate],
+                        colA: r[idxColA],
+                        colB: r[idxColB],
+                        colC: r[idxColC],
+                        colD: r[idxColD],
+                        prevQty: idxPrev >= 0 ? r[idxPrev] : undefined,
+                        taxType: r[idxTaxType],
+                        taxFreeAmount: r[idxTaxFree],
+                        taxableAmount: r[idxTaxable],
+                        amount: r[idxAmount],
+                        colE: r[idxColE]
+                    }))
+                    .filter(item => item.colB);
             }
 
-            // 2) 객체 배열 형태 대응 (영문 키 & 한글 시트 헤더 키 모두 호환)
-            rawList.forEach((item, idx) => {
-                if (!item || typeof item !== 'object') return;
+            return rawList
+                .filter(obj => obj && typeof obj === 'object')
+                .map((obj, i) => {
+                    const pick = (keys, fallback = '') => {
+                        for (const k of keys) {
+                            if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+                        }
+                        return fallback;
+                    };
+                    return normalizeOrderItem({
+                        id: pick(['id', 'ID', 'orderId', '고유번호'], `gs_${i}_${Date.now()}`),
+                        date: pick(['date', '발주일자', '일자', '날짜'], getTodayStr()),
+                        colA: pick(['colA', 'vendor', '거래처', '분류/거래처', '분류', 'A열'], ''),
+                        colB: pick(['colB', 'itemName', 'name', '원재료명', '품목명', '품명', '상품명', 'B열'], ''),
+                        colC: pick(['colC', 'spec', 'unit', '규격/단위', '규격', '단위', 'C열'], ''),
+                        colD: pick(['colD', 'qty', 'quantity', '입고수량', '발주수량', '수량', 'D열'], 0),
+                        prevQty: pick(['prevQty', '이전수량', '기존수량'], undefined),
+                        taxType: pick(['taxType', '과세구분', '구분'], ''),
+                        taxFreeAmount: pick(['taxFreeAmount', '면세금액', '면세'], 0),
+                        taxableAmount: pick(['taxableAmount', '과세금액', '과세'], 0),
+                        amount: pick(['amount', 'totalAmount', '발주금액', '합계금액', '금액'], 0),
+                        colE: pick(['colE', 'remark', 'note', '비고', 'E열'], '')
+                    });
+                })
+                .filter(item => item.colB);
+        }
 
-                const colB = String(pickSheetField(
-                    item,
-                    ['colB', '원재료명', 'B열(원재료명)', '원재료명(B열)', '품목명', '품명', '원재료', '품목', 'itemName', 'name', 'item', 'material', 'productName'],
-                    ['원재료', '품목', '품명', '상품명', 'b열']
-                ) ?? '').trim();
+        async function fetchSheetOrdersWithMeta() {
+            const sep = gasWebAppUrl.includes('?') ? '&' : '?';
+            const reqUrl = `${gasWebAppUrl}${sep}action=getOrders&t=${Date.now()}`;
+            const res = await fetch(reqUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+            const text = await res.text();
 
-                const explicitOrderQty = pickSheetField(item, ['이전수량', '기존수량', 'prevQty', 'originalQty']);
-                const hasBothOrderAndRecv = (item['발주수량'] !== undefined && item['입고수량'] !== undefined);
+            if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+                throw new Error('AUTH_HTML_RESPONSE');
+            }
 
-                const rawColD = hasBothOrderAndRecv
-                    ? item['입고수량']
-                    : pickSheetField(
-                        item,
-                        ['colD', '입고수량', 'D열(발주수량)', '발주수량(D열)', '발주수량', '수량', 'qty', 'quantity', 'orderQty'],
-                        ['입고수량', '발주수량', 'd열', '수량']
-                    );
+            let json = JSON.parse(text);
+            let parsedOrders = parseSheetRows(json);
+            let rawTextUsed = text;
 
-                const rawPrevQty = explicitOrderQty !== undefined
-                    ? explicitOrderQty
-                    : (hasBothOrderAndRecv ? item['발주수량'] : undefined);
+            if (parsedOrders === null) {
+                const fallbackRes = await fetch(`${gasWebAppUrl}${sep}t=${Date.now()}`, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+                const fallbackText = await fallbackRes.text();
+                rawTextUsed = fallbackText;
+                json = JSON.parse(fallbackText);
+                parsedOrders = parseSheetRows(json);
+            }
 
-                const rawAmt = pickSheetField(
-                    item,
-                    ['amount', 'totalAmount', '총발주금액', '발주금액', '합계금액', '총금액', '금액', 'orderAmount', 'price'],
-                    ['총발주금액', '발주금액', '합계금액', '공급가액']
-                );
+            if (parsedOrders === null) {
+                showRawLog(`HTTP ${res.status} · 스키마 불일치`, rawTextUsed);
+                throw new Error('INVALID_JSON_SCHEMA');
+            }
 
-                if (!colB && parseNumeric(rawColD) === 0 && parseNumeric(rawAmt) === 0) return;
-                if (/^(원재료명|품목명|품명)$/.test(colB.replace(/\s+/g, ''))) return;
+            const sheetInfo = (json && typeof json === 'object')
+                ? [json.spreadsheetName, json.sheetName].filter(Boolean).join(' / ')
+                : '';
 
-                parsed.push(normalizeOrderItem({
-                    id: pickSheetField(item, ['id', 'ID', '고유ID', 'orderId', 'uid', 'rowId'], ['고유id']) ?? `ord_gs_${idx}`,
-                    date: pickSheetField(item, ['date', '발주일자', '일자', '날짜', 'orderDate', '입고일자'], ['발주일', '입고일', '일자', '날짜']),
-                    colA: pickSheetField(item, ['colA', '분류/거래처', 'A열(분류/거래처)', '거래처', '거래처명', '분류', 'vendor', 'category', 'supplier'], ['거래처', '분류', '발주처', 'a열']) ?? '',
-                    colB: colB || '(미지정 품목)',
-                    colC: pickSheetField(item, ['colC', '규격/단위', 'C열(규격/단위)', '규격', '단위', 'spec', 'unit', 'standard'], ['규격', '단위', 'c열']) ?? '',
-                    colD: rawColD ?? 0,
-                    prevQty: rawPrevQty,
-                    taxType: pickSheetField(item, ['taxType', '과세구분', '면세/과세', '구분', '면과세'], ['과세구분', '면과세']) ?? '과세',
-                    taxFreeAmount: pickSheetField(item, ['taxFreeAmount', '면세금액', '면세합계', '면세', 'taxFree'], ['면세금액', '면세합계']) ?? 0,
-                    taxableAmount: pickSheetField(item, ['taxableAmount', '과세금액', '과세합계', '과세', 'taxable'], ['과세금액', '과세합계']) ?? 0,
-                    amount: rawAmt ?? 0,
-                    colE: pickSheetField(item, ['colE', '비고', '비고/출처', 'E열(비고/출처)', '메모', 'remark', 'note', 'memo'], ['비고', '메모', 'e열']) ?? ''
-                }));
+            showRawLog(
+                `GET 성공 · 시트 행수: ${parsedOrders.length}건${sheetInfo ? ` (${sheetInfo})` : ''}`,
+                rawTextUsed
+            );
+
+            return { orders: parsedOrders, json, rawText: rawTextUsed, sheetInfo };
+        }
+
+        async function fetchSheetOrdersRaw() {
+            const result = await fetchSheetOrdersWithMeta();
+            return result.orders;
+        }
+
+        async function postToSheet(payload) {
+            const act = payload && payload.action ? encodeURIComponent(payload.action) : '';
+            const sep = gasWebAppUrl.includes('?') ? '&' : '?';
+            const postUrl = act ? `${gasWebAppUrl}${sep}action=${act}` : gasWebAppUrl;
+
+            const res = await fetch(postUrl, {
+                method: 'POST',
+                redirect: 'follow',
+                cache: 'no-store',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
             });
-
-            return parsed;
-        }
-
-        // 다양한 Apps Script doGet 파라미터 방식(기본/read/getOrders/get/load) 자동 호환 호출
-        async function fetchSheetDataSmart(baseUrl) {
-            const actionCandidates = ['', 'read', 'getOrders', 'get', 'load'];
-            let bestEmptyResult = null;
-            let lastErr = null;
-
-            for (const act of actionCandidates) {
-                try {
-                    const sep = baseUrl.includes('?') ? '&' : '?';
-                    const query = act ? `action=${act}&t=${Date.now()}` : `t=${Date.now()}`;
-                    const res = await fetch(`${baseUrl}${sep}${query}`, {
-                        method: 'GET',
-                        redirect: 'follow',
-                        credentials: 'omit'
-                    });
-                    let text = (await res.text()).trim();
-
-                    // JSONP 래퍼 형태가 섞여 있을 경우 벗겨내기
-                    const jsonpMatch = text.match(/^[a-zA-Z0-9_$]+\(([\s\S]*)\);?$/);
-                    if (jsonpMatch) text = jsonpMatch[1];
-
-                    const json = JSON.parse(text);
-                    const isExplicitError = json && typeof json === 'object' && !Array.isArray(json) && (
-                        json.status === 'error' ||
-                        json.result === 'error' ||
-                        json.ok === false ||
-                        json.success === false
-                    );
-                    if (isExplicitError) continue;
-
-                    const extracted = extractRowsFromSheetResponse(json);
-                    if (extracted.hasExplicitArray) {
-                        if (extracted.rows.length > 0) {
-                            return extracted;
-                        }
-                        if (!bestEmptyResult) {
-                            bestEmptyResult = extracted;
-                        }
-                        // 명시적인 성공 플래그와 함께 빈 배열이면 실제 빈 시트로 판단
-                        if (json.status === 'success' || json.result === 'success' || json.ok === true || json.success === true || Array.isArray(json)) {
-                            return extracted;
-                        }
-                    }
-                } catch (err) {
-                    lastErr = err;
-                    // HTML 로그인 페이지 응답 등인 경우 즉시 중단
-                    if (err instanceof SyntaxError && act === '') {
-                        throw new Error('AUTH_OR_HTML_RESPONSE');
-                    }
-                }
+            const text = await res.text();
+            if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+                throw new Error('AUTH_HTML_RESPONSE');
             }
-
-            if (bestEmptyResult) return bestEmptyResult;
-            throw lastErr || new Error('NO_VALID_SHEET_ARRAY');
+            showRawLog(`POST (${payload.action || '-'}) 응답 · HTTP ${res.status}`, text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                return { rawText: text };
+            }
         }
 
-        async function fetchOrdersFromSheet(manual = false) {
+        function isExplicitSheetErrorResponse(resp) {
+            if (!resp || typeof resp !== 'object') return false;
+            if (resp.status === 'error' || resp.result === 'error' || resp.success === false || resp.ok === false) {
+                return true;
+            }
+            if (typeof resp.error === 'string' && resp.error.trim() !== '') {
+                return true;
+            }
+            return false;
+        }
+
+        async function fetchOrdersFromSheet(isManual = false) {
             if (!gasWebAppUrl) {
-                if (manual) openGsModal();
+                if (isManual) openGsModal();
                 return;
             }
+
+            if (activeWritePromise) {
+                try { await activeWritePromise; } catch (e) {}
+            }
+
             if (isSyncingSheet) return;
+
             isSyncingSheet = true;
-            updateGsStatusBadge('SYNCING');
+            updateGsStatusUI('SYNCING', '동기화 중...');
 
             try {
-                const { rows: rawRows, hasExplicitArray } = await fetchSheetDataSmart(gasWebAppUrl);
-                const sheetOrders = parseSheetRows(rawRows);
+                const { orders: parsedOrders, sheetInfo } = await fetchSheetOrdersWithMeta();
                 lastSyncTimestamp = Date.now();
 
-                // 시트에 원본 행이 실제로 0건일 때만 로컬 데이터를 시트로 초기 업로드 (파싱 차이로 인한 덮어쓰기 방지)
-                if (hasExplicitArray && rawRows.length === 0 && ordersData.length > 0) {
-                    isSyncingSheet = false;
-                    await syncAllOrdersToSheet(false);
-                    updateGsStatusBadge('OK', `시트 자동저장 (${ordersData.length}건)`);
-                    return;
+                ordersData = parsedOrders;
+                if (ordersData.length === 0) {
+                    lastUploadPriceChanges = [];
+                    priceChangeById = new Map();
                 }
+                initYearAndMonthControls();
 
-                // 시트에 행이 존재하는데 파싱 결과가 0건인 경우 기존 데이터를 지우지 않고 진단 안내
-                if (rawRows.length > 0 && sheetOrders.length === 0) {
-                    throw new Error('ROW_SCHEMA_MISMATCH');
-                }
-
-                ordersData = sheetOrders;
-                saveData();
-
-                // 수동 동기화 클릭 시 현재 선택된 월에 내역이 없으면 가장 최근 발주월로 자동 이동하여 즉시 표시
-                if (manual && ordersData.length > 0 && currentPeriod !== 'ALL') {
-                    const hasInCurrentMonth = ordersData.some(o => o.date && o.date.startsWith(currentPeriod));
-                    if (!hasInCurrentMonth) {
+                if (isManual && currentPeriod !== 'ALL' && ordersData.length > 0) {
+                    const hasInCurrent = ordersData.some(o => o.date && o.date.startsWith(currentPeriod));
+                    if (!hasInCurrent) {
                         const latestYm = getLatestOrderPeriod();
                         if (latestYm) {
                             selectedYear = latestYm.substring(0, 4);
                             currentPeriod = latestYm;
+                            initYearAndMonthControls();
                         }
                     }
                 }
 
-                initYearAndMonthControls();
                 renderDashboard();
-
-                const nowTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-                updateGsStatusBadge('OK', `연동됨 (${nowTime})`);
-
-                const box = document.getElementById('gsDiagnosticBox');
-                if (box) {
-                    box.className = 'p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 space-y-1';
-                    box.innerHTML = `<p class="font-bold">구글 스프레드시트 연동 성공 (총 ${ordersData.length}건 불러옴)</p><p class="text-[11px]">최근 동기화 시각: ${nowTime} · 1시간 주기로 자동 동기화됩니다.</p>`;
+                const sheetLabel = sheetInfo ? ` [${sheetInfo}]` : '';
+                updateGsStatusUI('CONNECTED', `DB 연동됨 (${ordersData.length}건)`);
+                setGsDiagnostic(
+                    'ok',
+                    `구글 시트 조회 완료: 현재 실제 시트 데이터 ${ordersData.length}건${sheetLabel}`,
+                    'PC 로컬 캐시를 사용하지 않고 구글 시트 원본만 표시합니다. 실제 저장까지 정상 작동하는지 확인하려면 [DB 읽기·쓰기 정밀 점검]을 눌러주세요.'
+                );
+                if (isManual) {
+                    showToast(`구글 시트 원본에서 ${ordersData.length}건을 불러왔습니다.`, 'success');
                 }
-                if (manual) showToast(`구글 시트에서 ${ordersData.length}건을 불러왔습니다.`, 'success');
             } catch (err) {
-                console.warn('구글 시트 불러오기 오류:', err);
-                updateGsStatusBadge('ERROR');
-                const box = document.getElementById('gsDiagnosticBox');
-                if (box) {
-                    box.className = 'p-3.5 rounded-xl border border-red-200 bg-red-50 text-red-800 space-y-1';
-                    if (err && err.message === 'ROW_SCHEMA_MISMATCH') {
-                        box.innerHTML = `<p class="font-bold">시트 데이터 열 구조를 인식하지 못했습니다</p><p class="text-[11px]">스프레드시트의 첫 번째 행(헤더)에 원재료명·발주일자·수량 항목이 포함되어 있는지 확인해 주세요.</p>`;
-                    } else {
-                        box.innerHTML = `<p class="font-bold">구글 시트 응답을 읽을 수 없습니다</p><p class="text-[11px]">Apps Script 배포 시 [액세스 권한이 있는 사용자]가 <strong>'모든 사용자(Anyone)'</strong>로 설정되어 있는지 확인해 주세요.</p>`;
-                    }
+                console.error('구글 시트 동기화 실패:', err);
+                ordersData = [];
+                renderDashboard();
+                updateGsStatusUI('ERROR', 'DB 연결 오류');
+                if (err.message === 'AUTH_HTML_RESPONSE') {
+                    setGsDiagnostic('err', '접근 권한 오류 (구글 로그인 페이지 반환됨)', 'Apps Script 배포 설정에서 [액세스 권한이 있는 사용자]를 반드시 [모든 사용자(Anyone)]로 변경 후 새 버전으로 배포해 주세요.');
+                } else if (err.message === 'INVALID_JSON_SCHEMA') {
+                    setGsDiagnostic('err', '응답 데이터 형식 불일치', '연결된 웹앱이 발주 배열을 반환하지 않고 있습니다. 아래 응답 로그와 표준 Apps Script 코드를 확인해 주세요.');
+                } else {
+                    setGsDiagnostic('err', 'DB 연결 실패', `오류 내용: ${err.message || err}. 웹 앱 URL과 배포 권한을 확인해 주세요.`);
                 }
-                if (manual) showToast('구글 시트 데이터를 불러오지 못했습니다. 설정 창 진단을 확인해 주세요.', 'error');
+                if (isManual) {
+                    showToast('구글 시트 DB 연결에 실패했습니다. 설정 창의 진단 결과를 확인해 주세요.', 'error');
+                }
             } finally {
                 isSyncingSheet = false;
             }
         }
 
-        // POST 전송 시 스크립트 버전에 따른 action 명칭(append/appendOrders, syncAll/saveAll/replaceAllOrders 등) 자동 호환
-        async function postSheetSmart(actionList, ordersPayload) {
-            for (let i = 0; i < actionList.length; i++) {
-                const act = actionList[i];
-                const bodyStr = JSON.stringify({
-                    action: act,
-                    orders: ordersPayload,
-                    data: ordersPayload,
-                    rows: ordersPayload,
-                    items: ordersPayload
-                });
-
-                try {
-                    const res = await fetch(gasWebAppUrl, {
-                        method: 'POST',
-                        redirect: 'follow',
-                        credentials: 'omit',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: bodyStr
-                    });
-                    const txt = await res.text();
-                    const parsed = JSON.parse(txt);
-                    if (parsed && (parsed.status === 'error' || parsed.result === 'error' || parsed.ok === false)) {
-                        continue; // 다음 호환 action 명칭으로 재시도
-                    }
-                    return true;
-                } catch (corsOrParseErr) {
-                    // 로컬 파일(file://) 등 CORS 제한 환경에서는 no-cors 폴백 전송
-                    await fetch(gasWebAppUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: bodyStr
-                    });
-                    return true;
-                }
-            }
-            return false;
+        function serializeOrderForSheet(o) {
+            return {
+                id: o.id,
+                date: normalizeDateStr(o.date),
+                colA: o.colA || '',
+                colB: o.colB || '',
+                colC: o.colC || '',
+                colD: Number(o.colD || 0),
+                prevQty: o.prevQty !== null && o.prevQty !== undefined ? Number(o.prevQty) : '',
+                taxType: o.taxType || '과세',
+                taxFreeAmount: Math.round(Number(o.taxFreeAmount || 0)),
+                taxableAmount: Math.round(Number(o.taxableAmount || 0)),
+                amount: Math.round(Number(o.amount || 0)),
+                colE: sanitizeRemark(o.colE)
+            };
         }
 
         async function appendOrdersToSheet(newOrders) {
-            if (!gasWebAppUrl || !newOrders || newOrders.length === 0) return;
-            updateGsStatusBadge('SYNCING');
+            if (!gasWebAppUrl || !Array.isArray(newOrders) || newOrders.length === 0) return;
+
+            const runAppend = async () => {
+                if (activeWritePromise) {
+                    try { await activeWritePromise; } catch (e) {}
+                }
+                updateGsStatusUI('SYNCING', 'DB 저장 및 검증 중...');
+                try {
+                    const beforeOrders = await fetchSheetOrdersRaw();
+                    const expectedCount = beforeOrders.length + newOrders.length;
+                    const serialized = newOrders.map(serializeOrderForSheet);
+
+                    let verified = false;
+                    for (const act of ['appendOrders', 'addOrders', 'append']) {
+                        const resp = await postToSheet({
+                            action: act,
+                            orders: serialized,
+                            data: serialized,
+                            rows: serialized
+                        });
+                        if (isExplicitSheetErrorResponse(resp)) continue;
+
+                        const afterOrders = await fetchSheetOrdersRaw();
+                        if (afterOrders.length >= expectedCount) {
+                            ordersData = afterOrders;
+                            verified = true;
+                            break;
+                        }
+                    }
+
+                    if (!verified) {
+                        const mergedAll = beforeOrders.concat(newOrders).map(serializeOrderForSheet);
+                        for (const act of ['syncAll', 'replaceAll', 'saveAll']) {
+                            const resp = await postToSheet({
+                                action: act,
+                                orders: mergedAll,
+                                data: mergedAll,
+                                rows: mergedAll
+                            });
+                            if (isExplicitSheetErrorResponse(resp)) continue;
+
+                            const afterOrders = await fetchSheetOrdersRaw();
+                            if (afterOrders.length >= expectedCount) {
+                                ordersData = afterOrders;
+                                verified = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    lastSyncTimestamp = Date.now();
+
+                    if (!verified) {
+                        updateGsStatusUI('ERROR', 'DB 저장 미반영!');
+                        setGsDiagnostic(
+                            'err',
+                            '구글 시트에 데이터가 실제로 기록되지 않았습니다!',
+                            '서버로 전송했으나 구글 시트 행 수가 증가하지 않았습니다. 원재료 발주 시트의 Apps Script 코드가 구버전이거나 [새 버전]으로 배포되지 않았습니다. 아래 표준 Apps Script 코드를 적용해 주세요.'
+                        );
+                        showToast('경고: 구글 시트 DB에 저장되지 않았습니다! 연동 설정 창을 확인해 주세요.', 'error');
+                        openGsModal();
+                        return;
+                    }
+
+                    renderDashboard();
+                    updateGsStatusUI('CONNECTED', `DB 저장 확인됨 (${ordersData.length}건)`);
+                    showToast(`구글 시트 DB에 실제 저장 확인 완료 (총 ${ordersData.length}건)`, 'success');
+                } catch (err) {
+                    console.error('시트 추가 저장 실패:', err);
+                    updateGsStatusUI('ERROR', 'DB 저장 오류');
+                    showToast('구글 시트 DB 저장 중 오류가 발생했습니다.', 'error');
+                }
+            };
+
+            const p = runAppend();
+            activeWritePromise = p;
             try {
-                await postSheetSmart(['appendOrders', 'append', 'addOrders', 'add'], newOrders);
-                lastSyncTimestamp = Date.now();
-                const nowTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-                updateGsStatusBadge('OK', `연동됨 (${nowTime})`);
-            } catch (err) {
-                console.warn('시트 추가 전송 오류:', err);
-                updateGsStatusBadge('ERROR');
+                await p;
+            } finally {
+                if (activeWritePromise === p) activeWritePromise = null;
             }
         }
 
-        async function syncAllOrdersToSheet(showAlert = false) {
+        async function runDeepDbDiagnostics() {
+            const val = String(document.getElementById('gsUrlInput').value || gasWebAppUrl || '').trim();
+            onGsUrlInputAutoSave(val);
+            if (!val) {
+                showToast('웹 앱 URL을 먼저 입력해 주세요.', 'error');
+                return;
+            }
+
+            setGsDiagnostic('warn', '1/3단계: 구글 시트(GET) 실제 연결 및 시트 정보 조회 중...', '잠시만 기다려 주세요...');
+            updateGsStatusUI('SYNCING', 'DB 정밀 점검 중...');
+
+            try {
+                const step1 = await fetchSheetOrdersWithMeta();
+                const originalOrders = step1.orders;
+                const sheetWhere = step1.sheetInfo ? ` (연결된 파일/시트탭: ${step1.sheetInfo})` : '';
+
+                setGsDiagnostic(
+                    'warn',
+                    `2/3단계: 조회 성공(현재 ${originalOrders.length}건)${sheetWhere} → 실제 쓰기(POST) 테스트 중...`,
+                    '임시 점검 데이터를 시트에 기록한 뒤 실제로 행이 늘어나는지 확인합니다.'
+                );
+
+                const testId = `__DB_DIAG_${Date.now()}`;
+                const testOrder = serializeOrderForSheet({
+                    id: testId,
+                    date: getTodayStr(),
+                    colA: 'DB점검',
+                    colB: '__원재료DB_연동점검_임시행__',
+                    colC: 'TEST',
+                    colD: 1,
+                    taxType: '과세',
+                    taxFreeAmount: 0,
+                    taxableAmount: 100,
+                    amount: 100,
+                    colE: ''
+                });
+
+                await postToSheet({
+                    action: 'appendOrders',
+                    orders: [testOrder],
+                    data: [testOrder],
+                    rows: [testOrder]
+                });
+
+                const afterWrite = await fetchSheetOrdersWithMeta();
+                const writeFound = afterWrite.orders.some(o => String(o.id).includes(testId) || o.colB === '__원재료DB_연동점검_임시행__');
+
+                if (!writeFound) {
+                    updateGsStatusUI('ERROR', 'DB 쓰기 실패');
+                    setGsDiagnostic(
+                        'err',
+                        `조회(GET)는 되지만 구글 시트에 쓰기(POST)가 전혀 반영되지 않습니다! (시트 행수 그대로 ${afterWrite.orders.length}건)`,
+                        '원인: 현재 웹앱 URL에 연결된 Apps Script에 doPost 저장 로직이 없거나, 다른 시트 파일/탭을 가리키고 있거나, 수정 후 [새 버전 배포]를 하지 않은 상태입니다. 아래 [표준 Apps Script 코드]를 복사해 시트에 붙여넣고 [새 버전]으로 배포해 주세요.'
+                    );
+                    showToast('점검 결과: 구글 시트에 저장(POST)이 되지 않고 있습니다!', 'error');
+                    return;
+                }
+
+                setGsDiagnostic('warn', '3/3단계: 실제 시트 쓰기 확인 완료! 테스트 임시 행 정리 중...', '원래 데이터 상태로 복구하고 있습니다.');
+                const restoredSerialized = originalOrders.map(serializeOrderForSheet);
+                let cleanupVerified = false;
+
+                for (const act of ['syncAll', 'replaceAll', 'clearAll']) {
+                    if (act === 'clearAll' && restoredSerialized.length > 0) continue;
+                    await postToSheet({
+                        action: act,
+                        orders: restoredSerialized,
+                        data: restoredSerialized,
+                        rows: restoredSerialized,
+                        clear: restoredSerialized.length === 0
+                    });
+                    const afterCleanup = await fetchSheetOrdersWithMeta();
+                    if (!afterCleanup.orders.some(o => String(o.id).includes(testId) || o.colB === '__원재료DB_연동점검_임시행__')) {
+                        ordersData = afterCleanup.orders;
+                        cleanupVerified = true;
+                        break;
+                    }
+                }
+
+                if (!cleanupVerified) {
+                    ordersData = (await fetchSheetOrdersRaw());
+                }
+
+                initYearAndMonthControls();
+                renderDashboard();
+
+                if (cleanupVerified) {
+                    updateGsStatusUI('CONNECTED', `DB 정상 (${ordersData.length}건)`);
+                    setGsDiagnostic(
+                        'ok',
+                        `점검 완료: 조회·저장·삭제/초기화 모두 100% 정상 작동합니다!${sheetWhere}`,
+                        `현재 실제 구글 시트에 저장된 데이터는 ${ordersData.length}건입니다.`
+                    );
+                    showToast('원재료 발주 DB 읽기·쓰기·삭제 모든 점검을 통과했습니다!', 'success');
+                } else {
+                    updateGsStatusUI('ERROR', '삭제/덮어쓰기 미지원');
+                    setGsDiagnostic(
+                        'warn',
+                        '조회와 추가 저장(append)은 작동하나, 삭제/초기화(syncAll) 코드가 구버전입니다.',
+                        '전체 비우기 및 수량 수정이 시트에 반영되도록 아래 [표준 Apps Script 코드]로 업데이트 후 새 버전으로 배포해 주세요.'
+                    );
+                }
+            } catch (err) {
+                console.error('DB 정밀 점검 실패:', err);
+                updateGsStatusUI('ERROR', 'DB 점검 실패');
+                if (err.message === 'AUTH_HTML_RESPONSE') {
+                    setGsDiagnostic('err', '권한 차단됨 (구글 로그인 HTML 반환)', 'Apps Script [배포 관리]에서 액세스 권한을 [모든 사용자(Anyone)]로 설정해 주세요.');
+                } else {
+                    setGsDiagnostic('err', 'DB 통신 실패', `점검 중 오류 발생: ${err.message || err}`);
+                }
+            }
+        }
+
+        async function syncAllOrdersToSheet(isManual = false) {
             if (!gasWebAppUrl) {
-                if (showAlert) showToast('먼저 구글 시트 웹 앱 URL을 입력해 주세요.', 'error');
+                if (isManual) showToast('먼저 웹 앱 URL을 입력해 주세요.', 'error');
                 return;
             }
-            updateGsStatusBadge('SYNCING');
+
+            const runSyncAll = async () => {
+                if (activeWritePromise) {
+                    try { await activeWritePromise; } catch (e) {}
+                }
+                updateGsStatusUI('SYNCING', ordersData.length === 0 ? '시트 초기화 중...' : '전체 저장 중...');
+
+                try {
+                    const serialized = ordersData.map(serializeOrderForSheet);
+                    const isClearing = serialized.length === 0;
+
+                    let preferredAction = '';
+                    try {
+                        preferredAction = localStorage.getItem(isClearing ? STORAGE_KEY_GAS_CLEAR_ACTION : STORAGE_KEY_GAS_SYNC_ACTION) || '';
+                    } catch (e) {}
+
+                    const defaultCandidates = isClearing
+                        ? ['syncAll', 'clearAll', 'clear', 'replaceAll', 'saveAll', 'overwrite', 'clearSheet', 'deleteAll', 'reset']
+                        : ['syncAll', 'replaceAll', 'saveAll', 'overwrite', 'syncOrders', 'saveOrders'];
+
+                    const candidates = Array.from(new Set([preferredAction, ...defaultCandidates].filter(Boolean)));
+                    let verified = false;
+                    let latestSheetOrders = null;
+
+                    for (const act of candidates) {
+                        const resp = await postToSheet({
+                            action: act,
+                            orders: serialized,
+                            data: serialized,
+                            rows: serialized,
+                            items: serialized,
+                            clear: isClearing,
+                            forceClear: isClearing,
+                            allowEmpty: true
+                        });
+
+                        if (isExplicitSheetErrorResponse(resp)) {
+                            continue;
+                        }
+
+                        latestSheetOrders = await fetchSheetOrdersRaw();
+                        if (latestSheetOrders.length === serialized.length) {
+                            verified = true;
+                            try {
+                                localStorage.setItem(isClearing ? STORAGE_KEY_GAS_CLEAR_ACTION : STORAGE_KEY_GAS_SYNC_ACTION, act);
+                            } catch (e) {}
+                            break;
+                        }
+                    }
+
+                    if (!verified && isClearing && Array.isArray(latestSheetOrders) && latestSheetOrders.length > 0) {
+                        const rawIds = latestSheetOrders.map(r => r.id).filter(Boolean);
+                        const baseIds = latestSheetOrders.map(r => stripPrevQtyFromId(r.id)).filter(Boolean);
+                        const allIds = Array.from(new Set([...rawIds, ...baseIds]));
+
+                        for (const delAct of ['deleteOrders', 'deleteByIds', 'removeOrders']) {
+                            await postToSheet({ action: delAct, ids: allIds, orderIds: allIds });
+                            latestSheetOrders = await fetchSheetOrdersRaw();
+                            if (latestSheetOrders.length === 0) {
+                                verified = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    lastSyncTimestamp = Date.now();
+
+                    if (!verified && isClearing && Array.isArray(latestSheetOrders) && latestSheetOrders.length > 0) {
+                        updateGsStatusUI('ERROR', '시트 초기화 미반영');
+                        setGsDiagnostic(
+                            'warn',
+                            `구글 시트에 기존 데이터 ${latestSheetOrders.length}건이 남아 있습니다`,
+                            '현재 배포된 Apps Script에 전체 삭제/초기화 처리 코드가 없거나 거부되었습니다. 표준 Apps Script 코드를 적용하거나 시트에서 직접 데이터 행을 비워주세요.'
+                        );
+                        if (isManual) {
+                            showToast('구글 시트에서 행 삭제가 지원되지 않아 설정 창 안내를 확인해 주세요.', 'error');
+                        }
+                        return;
+                    }
+
+                    updateGsStatusUI('CONNECTED', `DB 연동됨 (${ordersData.length}건)`);
+                    setGsDiagnostic(
+                        'ok',
+                        isClearing ? '구글 시트 전체 데이터 초기화 완료' : '구글 시트 데이터 저장 완료',
+                        `현재 구글 시트에 ${ordersData.length}건 상태가 정확히 반영되었습니다.`
+                    );
+                    if (isManual) {
+                        showToast(
+                            isClearing
+                                ? '대시보드와 구글 시트의 모든 데이터가 초기화되었습니다.'
+                                : `대시보드 데이터 ${ordersData.length}건을 시트에 저장했습니다.`,
+                            'success'
+                        );
+                    }
+                } catch (err) {
+                    console.error('전체 시트 동기화 오류:', err);
+                    updateGsStatusUI('ERROR', '시트 저장 오류');
+                    if (isManual) {
+                        showToast('시트 덮어쓰기 중 오류가 발생했습니다.', 'error');
+                    }
+                }
+            };
+
+            const p = runSyncAll();
+            activeWritePromise = p;
             try {
-                await postSheetSmart(['replaceAllOrders', 'syncAll', 'saveAll', 'replaceAll', 'overwrite', 'sync'], ordersData);
-                lastSyncTimestamp = Date.now();
-                const nowTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-                updateGsStatusBadge('OK', `연동됨 (${nowTime})`);
-                if (showAlert) showToast(`시트에 전체 데이터(${ordersData.length}건) 전송을 완료했습니다.`, 'success');
-            } catch (err) {
-                console.warn('시트 전체 동기화 오류:', err);
-                updateGsStatusBadge('ERROR');
-                if (showAlert) showToast('시트 전송 중 오류가 발생했습니다.', 'error');
+                await p;
+            } finally {
+                if (activeWritePromise === p) activeWritePromise = null;
             }
         }
 
-        // 현재 입력된 웹 앱 URL이 코드 내 DEFAULT_GAS_URL에 고정된 완성본 HTML 다운로드
         function downloadEmbeddedHtmlWithUrl() {
-            const urlToEmbed = (document.getElementById('gsUrlInput').value || gasWebAppUrl || '').trim();
-            if (!urlToEmbed) {
-                showToast('먼저 고정할 웹 앱 URL을 입력해 주세요.', 'error');
+            const currentUrl = String(document.getElementById('gsUrlInput').value || gasWebAppUrl || '').trim();
+            if (!currentUrl) {
+                showToast('고정할 Google Apps Script 웹 앱 URL을 먼저 입력해 주세요.', 'error');
                 return;
             }
-            const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(
-                /const DEFAULT_GAS_URL\s*=\s*"[^"]*";/,
-                `const DEFAULT_GAS_URL = "${urlToEmbed.replace(/"/g, '\\"')}";`
+
+            const cloneRoot = document.documentElement.cloneNode(true);
+            ['uploadModal', 'editOrderModal', 'gsModal', 'confirmModal', 'priceAlertModal'].forEach(mId => {
+                const m = cloneRoot.querySelector(`#${mId}`);
+                if (m) {
+                    m.classList.add('hidden');
+                    m.classList.remove('flex');
+                }
+            });
+            ['toastContainer', 'historyCardsContainer', 'vendorCardsContainer', 'summaryTableBody'].forEach(cId => {
+                const c = cloneRoot.querySelector(`#${cId}`);
+                if (c) c.innerHTML = '';
+            });
+
+            const escapedUrl = currentUrl.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            const fullHtml = '<!DOCTYPE html>\n' + cloneRoot.outerHTML.replace(
+                /const\s+DEFAULT_GAS_URL\s*=\s*"[^"]*";/,
+                `const DEFAULT_GAS_URL = "${escapedUrl}";`
             );
+
             const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'baroga_order_dashboard.html';
+            link.download = 'index.html';
             document.body.appendChild(link);
             link.click();
-            link.remove();
-            showToast('스크립트 URL이 고정된 HTML 파일이 다운로드되었습니다.', 'success');
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast('URL이 고정된 index.html 파일이 다운로드되었습니다.', 'success');
         }
 
         // =========================================================================
         // 초기 구동 및 드래그 앤 드롭 바인딩
         // =========================================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('quickDate').value = getTodayStr();
-            document.getElementById('uploadDefaultDate').value = getTodayStr();
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = getTodayStr();
+            const qDate = document.getElementById('quickDate');
+            const uDate = document.getElementById('uploadDefaultDate');
+            if (qDate) qDate.value = today;
+            if (uDate) uDate.value = today;
 
-            // 드래그 앤 드롭 이벤트 연결
             const dropZone = document.getElementById('dropZone');
             if (dropZone) {
                 ['dragenter', 'dragover'].forEach(evtName => {
