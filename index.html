@@ -1982,16 +1982,16 @@ function doPost(e) {
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="border-b border-stone-100 bg-stone-50/70 text-[11px] font-semibold text-stone-400 whitespace-nowrap">
-                                        <th class="py-2 px-2 w-8 text-center">No</th>
-                                        <th class="py-2 px-2.5">분류/거래처</th>
-                                        <th class="py-2 px-2.5">원재료명</th>
-                                        <th class="py-2 px-2">규격/단위</th>
-                                        <th class="py-2 px-2 text-center">구분</th>
-                                        <th class="py-2 px-2.5 text-right bg-blue-50/30 text-blue-800">입고수량</th>
-                                        <th class="py-2 px-2 text-right text-stone-600">발주금액</th>
-                                        <th class="py-2 px-2.5 text-right bg-amber-50/40 text-amber-900">합산금액</th>
-                                        <th class="py-2 px-2 w-24">비고</th>
-                                        <th class="py-2 px-2 w-16 text-center">관리</th>
+                                        <th class="py-2 px-1 w-7 text-center">No</th>
+                                        <th class="py-2 px-1.5">분류/거래처</th>
+                                        <th class="py-2 px-1.5">원재료명</th>
+                                        <th class="py-2 px-1.5">규격</th>
+                                        <th class="py-2 px-1 w-11 text-center">구분</th>
+                                        <th class="py-2 px-1.5 text-right bg-blue-50/30 text-blue-800">입고수량</th>
+                                        <th class="py-2 px-1.5 text-right text-stone-600">발주금액</th>
+                                        <th class="py-2 px-1.5 text-right bg-amber-50/40 text-amber-900">합산금액</th>
+                                        <th class="py-2 px-1 w-12 text-center">비고</th>
+                                        <th class="py-2 px-1 w-12 text-center">관리</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-stone-100 text-xs">
@@ -1999,7 +1999,7 @@ function doPost(e) {
                                         const { unitAmt, lineTotal } = getOrderLineAmounts(row);
                                         const hasModifiedQty = row.prevQty !== null && row.prevQty !== undefined && Number(row.prevQty) !== Number(row.colD);
                                         const qtyHtml = hasModifiedQty
-                                            ? `<span class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                            ? `<span class="inline-flex items-center justify-end gap-1 whitespace-nowrap">
                                                     <span class="line-through text-stone-400 font-medium text-[11px]">${formatNumber(row.prevQty)}</span>
                                                     <span class="font-extrabold ${Number(row.colD) === 0 ? 'text-red-600' : 'text-blue-700'}">${formatNumber(row.colD)}</span>
                                                </span>`
@@ -2017,27 +2017,27 @@ function doPost(e) {
                                             : '';
 
                                         return `
-                                            <tr class="hover:bg-stone-50/80 transition whitespace-nowrap ${Number(row.colD) === 0 && hasModifiedQty ? 'bg-red-50/20' : ''}">
-                                                <td class="py-2 px-2 text-center text-[11px] text-stone-400 font-mono">${idx + 1}</td>
-                                                <td class="py-2 px-2.5 text-stone-600 font-medium">${escapeHtml(row.colA || '-')}</td>
-                                                <td class="py-2 px-2.5 font-bold text-stone-800">${escapeHtml(row.colB)}</td>
-                                                <td class="py-2 px-2 text-stone-500">${escapeHtml(row.colC || '-')}</td>
-                                                <td class="py-2 px-2 text-center">${getTaxBadgeHtml(row.taxType)}</td>
-                                                <td class="py-2 px-2.5 text-right bg-blue-50/20">${qtyHtml}</td>
-                                                <td class="py-2 px-2 text-right font-semibold text-stone-700">${priceChangeBadge}${formatNumber(Math.round(unitAmt))}원</td>
-                                                <td class="py-2 px-2.5 text-right bg-amber-50/25 font-extrabold ${Number(row.colD) === 0 && hasModifiedQty ? 'text-red-600' : 'text-stone-900'}">${formatNumber(Math.round(lineTotal))}원</td>
-                                                <td class="py-1.5 px-2">
-                                                    <input type="text" value="${escapeHtml(row.colE || '')}" placeholder=""
+                                            <tr class="hover:bg-stone-50/80 transition ${Number(row.colD) === 0 && hasModifiedQty ? 'bg-red-50/20' : ''}">
+                                                <td class="py-2 px-1 text-center text-[11px] text-stone-400 font-mono whitespace-nowrap">${idx + 1}</td>
+                                                <td class="py-2 px-1.5 text-stone-600 font-medium text-[11px] sm:text-xs max-w-[84px] truncate" title="${escapeHtml(row.colA || '-')}">${escapeHtml(row.colA || '-')}</td>
+                                                <td class="py-2 px-1.5 font-bold text-stone-800 break-keep leading-snug">${escapeHtml(row.colB)}</td>
+                                                <td class="py-2 px-1.5 text-stone-500 text-[11px] max-w-[72px] truncate" title="${escapeHtml(row.colC || '-')}">${escapeHtml(row.colC || '-')}</td>
+                                                <td class="py-2 px-1 text-center whitespace-nowrap">${getTaxBadgeHtml(row.taxType)}</td>
+                                                <td class="py-2 px-1.5 text-right bg-blue-50/20 whitespace-nowrap">${qtyHtml}</td>
+                                                <td class="py-2 px-1.5 text-right font-semibold text-stone-700 whitespace-nowrap">${priceChangeBadge}${formatNumber(Math.round(unitAmt))}원</td>
+                                                <td class="py-2 px-1.5 text-right bg-amber-50/25 font-extrabold whitespace-nowrap ${Number(row.colD) === 0 && hasModifiedQty ? 'text-red-600' : 'text-stone-900'}">${formatNumber(Math.round(lineTotal))}원</td>
+                                                <td class="py-1 px-1 w-12 text-center">
+                                                    <input type="text" value="${escapeHtml(row.colE || '')}" title="${escapeHtml(row.colE || '')}" placeholder=""
                                                         onkeydown="if(event.key==='Enter'){this.blur();}"
                                                         onblur="updateInlineRemark('${escapeHtml(row.id)}', this.value)"
-                                                        class="w-20 sm:w-24 px-2 py-1 rounded border border-transparent hover:border-stone-300 focus:border-stone-500 bg-transparent focus:bg-white text-xs text-stone-700 focus:outline-none transition">
+                                                        class="w-11 px-1 py-0.5 rounded border border-transparent hover:border-stone-300 focus:border-stone-500 bg-transparent focus:bg-white text-[11px] text-stone-700 truncate focus:outline-none transition">
                                                 </td>
-                                                <td class="py-1.5 px-2 text-center">
-                                                    <div class="inline-flex items-center justify-center gap-1">
-                                                        <button onclick="openEditOrderModal('${escapeHtml(row.id)}')" class="p-1.5 rounded-md text-stone-500 hover:text-blue-700 hover:bg-blue-50 transition" title="수량/정보 수정">
+                                                <td class="py-1 px-1 w-12 text-center whitespace-nowrap">
+                                                    <div class="inline-flex items-center justify-center gap-0.5">
+                                                        <button onclick="openEditOrderModal('${escapeHtml(row.id)}')" class="p-1 rounded text-stone-500 hover:text-blue-700 hover:bg-blue-50 transition" title="수량/정보 수정">
                                                             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                                                         </button>
-                                                        <button onclick="deleteSingleOrder('${escapeHtml(row.id)}')" class="p-1.5 rounded-md text-stone-400 hover:text-red-600 hover:bg-red-50 transition" title="품목 삭제">
+                                                        <button onclick="deleteSingleOrder('${escapeHtml(row.id)}')" class="p-1 rounded text-stone-400 hover:text-red-600 hover:bg-red-50 transition" title="품목 삭제">
                                                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                                         </button>
                                                     </div>
