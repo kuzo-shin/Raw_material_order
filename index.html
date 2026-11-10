@@ -122,7 +122,7 @@
                             <i data-lucide="table-2" class="w-3 h-3"></i> 발주수량 & 면세/과세 금액 누적
                         </span>
                         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 font-mono">
-                            v1.2.3
+                            v1.3
                         </span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-stone-800 mt-1.5">바로가 공장 원재료 발주 통합 대시보드</h1>
@@ -462,7 +462,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold text-amber-700 mb-1">발주금액(원)</label>
+                                <label class="block text-[11px] font-semibold text-amber-700 mb-1">발주금액(개당)</label>
                                 <input type="number" step="any" id="quickAmount" placeholder="0" class="w-full px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50/30 focus:bg-white font-semibold text-stone-800 focus:outline-none focus:border-amber-500">
                             </div>
                         </div>
@@ -482,7 +482,7 @@
 
     <!-- 모달 1: 발주서 등록 (엑셀 파일 드래그 앤 드롭 & 표 붙여넣기) -->
     <div id="uploadModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
-        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-xl overflow-hidden">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-[95vw] max-w-2xl overflow-hidden">
             <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
                 <div class="flex items-center gap-2">
                     <i data-lucide="file-up" class="w-4 h-4 text-stone-800"></i>
@@ -535,7 +535,7 @@
 
     <!-- 모달 2: 품목 수량 / 거래처 / 환불 수정 모달 -->
     <div id="editOrderModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
-        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-md overflow-hidden">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-[95vw] max-w-xl overflow-hidden">
             <div class="px-5 py-3.5 border-b border-stone-200 flex items-center justify-between bg-stone-50">
                 <div class="flex items-center gap-2">
                     <i data-lucide="pencil" class="w-4 h-4 text-blue-600"></i>
@@ -584,10 +584,15 @@
                         </select>
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs font-semibold text-amber-700 mb-1">변경 발주 금액 (공급가, 원)</label>
-                        <input type="number" step="any" min="0" id="editNewAmount" required
+                        <label class="block text-xs font-semibold text-amber-700 mb-1">개당 발주 금액 (공급가, 원)</label>
+                        <input type="number" step="any" min="0" id="editNewAmount" required oninput="onEditQtyInputChange()"
                             class="w-full px-3 py-2 rounded-lg border border-amber-300 bg-amber-50/30 font-bold text-stone-900 text-xs sm:text-sm focus:outline-none focus:border-amber-500">
                     </div>
+                </div>
+
+                <div class="px-3 py-2 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between text-xs">
+                    <span class="font-semibold text-stone-600">변경 후 합산 금액 (개당 금액 × 입고수량)</span>
+                    <strong id="editLineTotalPreview" class="text-sm font-extrabold text-amber-900">0원</strong>
                 </div>
 
                 <div>
@@ -617,7 +622,7 @@
 
     <!-- 모달 3: 내 구글 스프레드시트 실시간 연동 설정 & DB 정밀 점검 팝업 -->
     <div id="gsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
-        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-[95vw] max-w-3xl overflow-hidden max-h-[90vh] flex flex-col">
             <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 shrink-0">
                 <div class="flex items-center gap-2">
                     <i data-lucide="database" class="w-4 h-4 text-emerald-600"></i>
@@ -720,8 +725,8 @@
     </div>
 
     <!-- 모달 5: 동일 품목 금액(단가) 변동 감지 알림 모달 -->
-    <div id="priceAlertModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-4">
-        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div id="priceAlertModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-black/45 backdrop-blur-[1px] p-3 sm:p-5">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-xl w-[96vw] max-w-[1160px] overflow-hidden flex flex-col max-h-[88vh]">
             <div class="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-amber-50/70">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center shrink-0">
@@ -754,7 +759,7 @@
             </div>
 
             <div class="px-5 py-3 bg-white border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-500">
-                <span>※ 발주 수량이 달라도 1단위당 기준 단가(발주금액 ÷ 수량)가 동일한 경우는 제외됩니다.</span>
+                <span>※ 발주 수량이 달라도 개당 발주금액(단가)이 직전 발주와 동일한 경우는 알림에서 제외됩니다.</span>
                 <button onclick="closePriceAlertModal()" class="px-4 py-1.5 rounded-lg bg-[#18242C] text-[#DFC082] text-xs font-bold hover:bg-stone-800 transition shrink-0">
                     확인
                 </button>
@@ -871,7 +876,6 @@ function doPost(e) {
         let collapsedDateCards = new Set();
         let collapsedVendorCards = new Set();
         let pendingConfirmAction = null;
-        let editUnitPriceSnapshot = 0;
 
         let priceChangeById = new Map();
         let lastUploadPriceChanges = [];
@@ -1043,6 +1047,23 @@ function doPost(e) {
                 taxableAmount: taxable,
                 amount: amt,
                 colE: sanitizeRemark(raw.colE)
+            };
+        }
+
+        // 품목 1건의 개당 발주금액 및 수량 반영 합산금액 계산
+        function getOrderLineAmounts(o) {
+            const qty = Number(o.colD || 0);
+            const rawTf = Number(o.taxFreeAmount || 0);
+            const rawTx = Number(o.taxableAmount || 0);
+            const unitAmt = Number(o.amount || 0) > 0 ? Number(o.amount || 0) : (rawTf + rawTx);
+            const lineTotal = unitAmt * qty;
+            const isTaxFree = o.taxType === '면세' || (rawTf > 0 && rawTx === 0);
+            return {
+                qty,
+                unitAmt,
+                lineTotal,
+                lineTaxFree: isTaxFree ? lineTotal : 0,
+                lineTaxable: isTaxFree ? 0 : lineTotal
             };
         }
 
@@ -1371,11 +1392,10 @@ function doPost(e) {
 
             chronological.forEach(({ item }) => {
                 const key = normalizeProductKey(item.colB);
-                const qty = Number(item.colD || 0);
-                const amt = Number(item.amount || 0);
-                if (!key || qty <= 0 || amt <= 0) return;
+                const { qty, unitAmt, lineTotal } = getOrderLineAmounts(item);
+                if (!key || qty <= 0 || unitAmt <= 0) return;
 
-                const unitPrice = amt / qty;
+                const unitPrice = unitAmt;
 
                 if (latestByProduct.has(key)) {
                     const prev = latestByProduct.get(key);
@@ -1394,7 +1414,7 @@ function doPost(e) {
                             prevQty: prev.qty,
                             newQty: qty,
                             prevAmount: prev.amount,
-                            newAmount: amt,
+                            newAmount: lineTotal,
                             prevUnitPrice: prev.unitPrice,
                             newUnitPrice: unitPrice,
                             diffUnit,
@@ -1410,7 +1430,7 @@ function doPost(e) {
                     colA: item.colA,
                     colC: item.colC,
                     qty,
-                    amount: amt,
+                    amount: lineTotal,
                     unitPrice
                 });
             });
@@ -1514,16 +1534,16 @@ function doPost(e) {
             }
 
             container.innerHTML = `
-                <div class="bg-white rounded-xl border border-stone-200 overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse table-auto">
                         <thead>
                             <tr class="border-b border-stone-200 bg-stone-50 text-[11px] font-semibold text-stone-500 whitespace-nowrap">
-                                <th class="py-2.5 px-3">발주일자 (직전 → 신규)</th>
+                                <th class="py-2.5 px-3.5">발주일자 (직전 → 신규)</th>
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명 / 규격</th>
-                                <th class="py-2.5 px-3 text-right">이전 단가 (총액/수량)</th>
-                                <th class="py-2.5 px-3 text-right">변동 단가 (총액/수량)</th>
-                                <th class="py-2.5 px-3 text-right">변동폭</th>
+                                <th class="py-2.5 px-3.5 text-right">이전 단가 (총액/수량)</th>
+                                <th class="py-2.5 px-3.5 text-right">변동 단가 (총액/수량)</th>
+                                <th class="py-2.5 px-3.5 text-right">변동폭</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-stone-100 text-xs">
@@ -1534,14 +1554,14 @@ function doPost(e) {
                                 const specChanged = c.prevSpec !== c.colC && c.prevSpec !== '-' && c.colC !== '-';
 
                                 return `
-                                    <tr class="hover:bg-stone-50/80 transition whitespace-nowrap">
-                                        <td class="py-2.5 px-3 font-mono text-[11px] text-stone-600">
+                                    <tr class="hover:bg-stone-50/80 transition">
+                                        <td class="py-2.5 px-3.5 font-mono text-[11px] text-stone-600 whitespace-nowrap">
                                             <span class="text-stone-400">${escapeHtml(c.prevDate)}</span>
                                             <span class="mx-1 text-stone-300">→</span>
                                             <strong class="text-stone-900">${escapeHtml(c.newDate)}</strong>
                                         </td>
-                                        <td class="py-2.5 px-3 text-stone-600 font-medium">${escapeHtml(c.colA)}</td>
-                                        <td class="py-2.5 px-3">
+                                        <td class="py-2.5 px-3 text-stone-600 font-medium break-keep">${escapeHtml(c.colA)}</td>
+                                        <td class="py-2.5 px-3 break-keep">
                                             <div class="font-bold text-stone-900">${escapeHtml(c.colB)}</div>
                                             <div class="text-[11px] text-stone-400">
                                                 ${specChanged
@@ -1549,16 +1569,16 @@ function doPost(e) {
                                                     : escapeHtml(c.colC)}
                                             </div>
                                         </td>
-                                        <td class="py-2.5 px-3 text-right">
+                                        <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
                                             <div class="font-semibold text-stone-600">${formatNumber(Math.round(c.prevUnitPrice))}원</div>
                                             <div class="text-[10px] text-stone-400">${formatNumber(Math.round(c.prevAmount))}원 / ${formatNumber(c.prevQty)}</div>
                                         </td>
-                                        <td class="py-2.5 px-3 text-right">
+                                        <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
                                             <div class="font-extrabold ${isUp ? 'text-red-600' : 'text-blue-700'}">${formatNumber(Math.round(c.newUnitPrice))}원</div>
                                             <div class="text-[10px] text-stone-400">${formatNumber(Math.round(c.newAmount))}원 / ${formatNumber(c.newQty)}</div>
                                         </td>
-                                        <td class="py-2.5 px-3 text-right">
-                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md font-extrabold text-[11px] border ${
+                                        <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-extrabold text-[11px] border ${
                                                 isUp
                                                     ? 'bg-red-50 text-red-600 border-red-200'
                                                     : 'bg-blue-50 text-blue-700 border-blue-200'
@@ -1616,16 +1636,10 @@ function doPost(e) {
                 if (o.date) {
                     orderDateSet.add(normalizeDateStr(o.date));
                 }
-                const qty = Number(o.colD || 0);
-                const rawTf = Number(o.taxFreeAmount || 0);
-                const rawTx = Number(o.taxableAmount || 0);
-                const tf = currentTaxFilter === '과세'
-                    ? 0
-                    : (rawTf > 0 ? rawTf : (o.taxType === '면세' && rawTx === 0 ? Number(o.amount || 0) : 0));
-                const tx = currentTaxFilter === '면세'
-                    ? 0
-                    : (rawTx > 0 ? rawTx : (o.taxType !== '면세' && rawTf === 0 ? Number(o.amount || 0) : 0));
-                const itemAmt = (tf + tx) > 0 ? (tf + tx) : Number(o.amount || 0);
+                const { qty, lineTotal, lineTaxFree, lineTaxable } = getOrderLineAmounts(o);
+                const tf = currentTaxFilter === '과세' ? 0 : lineTaxFree;
+                const tx = currentTaxFilter === '면세' ? 0 : lineTaxable;
+                const itemAmt = (tf + tx) > 0 ? (tf + tx) : lineTotal;
 
                 totalQty += qty;
                 totalTaxFree += tf;
@@ -1911,13 +1925,11 @@ function doPost(e) {
                 let dayAmt = 0;
 
                 items.forEach(it => {
-                    dayQty += Number(it.colD || 0);
-                    const tf = Number(it.taxFreeAmount || 0);
-                    const tx = Number(it.taxableAmount || 0);
-                    const a = (tf + tx) > 0 ? (tf + tx) : Number(it.amount || 0);
-                    dayTaxFree += tf;
-                    dayTaxable += tx;
-                    dayAmt += a;
+                    const { qty, lineTotal, lineTaxFree, lineTaxable } = getOrderLineAmounts(it);
+                    dayQty += qty;
+                    dayTaxFree += lineTaxFree;
+                    dayTaxable += lineTaxable;
+                    dayAmt += lineTotal;
                 });
                 const dayVatIncluded = dayAmt + (dayTaxable * 0.1);
 
@@ -1970,19 +1982,21 @@ function doPost(e) {
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="border-b border-stone-100 bg-stone-50/70 text-[11px] font-semibold text-stone-400 whitespace-nowrap">
-                                        <th class="py-2 px-2.5 w-8 text-center">No</th>
+                                        <th class="py-2 px-2 w-8 text-center">No</th>
                                         <th class="py-2 px-2.5">분류/거래처</th>
                                         <th class="py-2 px-2.5">원재료명</th>
                                         <th class="py-2 px-2">규격/단위</th>
                                         <th class="py-2 px-2 text-center">구분</th>
                                         <th class="py-2 px-2.5 text-right bg-blue-50/30 text-blue-800">입고수량</th>
-                                        <th class="py-2 px-2.5 text-right bg-amber-50/30 text-amber-900">발주금액</th>
-                                        <th class="py-2 px-2 w-28">비고</th>
+                                        <th class="py-2 px-2 text-right text-stone-600">발주금액</th>
+                                        <th class="py-2 px-2.5 text-right bg-amber-50/40 text-amber-900">합산금액</th>
+                                        <th class="py-2 px-2 w-24">비고</th>
                                         <th class="py-2 px-2 w-16 text-center">관리</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-stone-100 text-xs">
                                     ${items.map((row, idx) => {
+                                        const { unitAmt, lineTotal } = getOrderLineAmounts(row);
                                         const hasModifiedQty = row.prevQty !== null && row.prevQty !== undefined && Number(row.prevQty) !== Number(row.colD);
                                         const qtyHtml = hasModifiedQty
                                             ? `<span class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
@@ -1994,30 +2008,29 @@ function doPost(e) {
                                         const pChange = priceChangeById.get(row.id);
                                         const priceChangeBadge = pChange
                                             ? `<button type="button" onclick="openPriceAlertModal('PERIOD')"
-                                                    title="직전(${escapeHtml(pChange.prevDate)}) 단가 ${formatNumber(Math.round(pChange.prevUnitPrice))}원 → ${formatNumber(Math.round(pChange.newUnitPrice))}원 (${pChange.diffUnit > 0 ? '+' : ''}${formatNumber(Math.round(pChange.diffUnit))}원)"
-                                                    class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold border transition ${
+                                                    title="직전(${escapeHtml(pChange.prevDate)}) 단가 ${formatNumber(Math.round(pChange.prevUnitPrice))}원 → ${formatNumber(Math.round(pChange.newUnitPrice))}원 (${pChange.diffUnit > 0 ? '+' : ''}${formatNumber(Math.round(pChange.diffUnit))}원, ${pChange.diffUnit > 0 ? '+' : ''}${pChange.diffRate.toFixed(1)}%)"
+                                                    class="mr-1 inline-flex items-center justify-center px-1 py-0.5 rounded text-[9px] leading-none font-extrabold border align-middle transition ${
                                                         pChange.direction === 'UP'
                                                             ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
                                                             : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-                                                    }">
-                                                    ${pChange.direction === 'UP' ? '▲' : '▼'} ${pChange.diffUnit > 0 ? '+' : ''}${pChange.diffRate.toFixed(1)}%
-                                               </button>`
+                                                    }">${pChange.direction === 'UP' ? '▲' : '▼'}</button>`
                                             : '';
 
                                         return `
                                             <tr class="hover:bg-stone-50/80 transition whitespace-nowrap ${Number(row.colD) === 0 && hasModifiedQty ? 'bg-red-50/20' : ''}">
-                                                <td class="py-2 px-2.5 text-center text-[11px] text-stone-400 font-mono">${idx + 1}</td>
+                                                <td class="py-2 px-2 text-center text-[11px] text-stone-400 font-mono">${idx + 1}</td>
                                                 <td class="py-2 px-2.5 text-stone-600 font-medium">${escapeHtml(row.colA || '-')}</td>
                                                 <td class="py-2 px-2.5 font-bold text-stone-800">${escapeHtml(row.colB)}</td>
                                                 <td class="py-2 px-2 text-stone-500">${escapeHtml(row.colC || '-')}</td>
                                                 <td class="py-2 px-2 text-center">${getTaxBadgeHtml(row.taxType)}</td>
                                                 <td class="py-2 px-2.5 text-right bg-blue-50/20">${qtyHtml}</td>
-                                                <td class="py-2 px-2.5 text-right bg-amber-50/20 font-bold text-stone-800">${formatNumber(Math.round(row.amount || 0))}원${priceChangeBadge}</td>
+                                                <td class="py-2 px-2 text-right font-semibold text-stone-700">${priceChangeBadge}${formatNumber(Math.round(unitAmt))}원</td>
+                                                <td class="py-2 px-2.5 text-right bg-amber-50/25 font-extrabold ${Number(row.colD) === 0 && hasModifiedQty ? 'text-red-600' : 'text-stone-900'}">${formatNumber(Math.round(lineTotal))}원</td>
                                                 <td class="py-1.5 px-2">
                                                     <input type="text" value="${escapeHtml(row.colE || '')}" placeholder=""
                                                         onkeydown="if(event.key==='Enter'){this.blur();}"
                                                         onblur="updateInlineRemark('${escapeHtml(row.id)}', this.value)"
-                                                        class="w-24 sm:w-28 px-2 py-1 rounded border border-transparent hover:border-stone-300 focus:border-stone-500 bg-transparent focus:bg-white text-xs text-stone-700 focus:outline-none transition">
+                                                        class="w-20 sm:w-24 px-2 py-1 rounded border border-transparent hover:border-stone-300 focus:border-stone-500 bg-transparent focus:bg-white text-xs text-stone-700 focus:outline-none transition">
                                                 </td>
                                                 <td class="py-1.5 px-2 text-center">
                                                     <div class="inline-flex items-center justify-center gap-1">
@@ -2352,7 +2365,7 @@ function doPost(e) {
                         itemMonthlyMap.set(name, { name, total: 0, months: new Array(12).fill(0) });
                     }
                     const rec = itemMonthlyMap.get(name);
-                    const amt = Number(o.amount || 0);
+                    const { lineTotal: amt } = getOrderLineAmounts(o);
                     rec.total += amt;
                     rec.months[mIdx] += amt;
                 });
@@ -2363,31 +2376,42 @@ function doPost(e) {
 
                 const palette = [
                     '#18242C', '#D97706', '#2563EB', '#059669', '#DC2626',
-                    '#7C3AED', '#DB2777', '#0891B2', '#65A30D', '#EA580C'
+                    '#7C3AED', '#0891B2', '#DB2777', '#65A30D', '#EA580C'
                 ];
+
+                const datasets = top10Items.map((item, idx) => ({
+                    label: item.name.length > 10 ? item.name.substring(0, 10) + '…' : item.name,
+                    data: item.months.map(v => Math.round(v)),
+                    borderColor: palette[idx % palette.length],
+                    backgroundColor: palette[idx % palette.length],
+                    borderWidth: 2,
+                    pointRadius: 2.5,
+                    pointHoverRadius: 4,
+                    tension: 0.28,
+                    fill: false
+                }));
 
                 chartInstance = new Chart(ctx, {
                     type: 'line',
-                    data: {
-                        labels,
-                        datasets: top10Items.map((it, idx) => ({
-                            label: it.name.length > 9 ? it.name.substring(0, 9) + '…' : it.name,
-                            data: it.months.map(v => Math.round(v)),
-                            borderColor: palette[idx % palette.length],
-                            backgroundColor: palette[idx % palette.length],
-                            borderWidth: 2,
-                            pointRadius: 2.5,
-                            tension: 0.25
-                        }))
-                    },
+                    data: { labels, datasets },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
                         plugins: {
                             legend: {
-                                display: true,
+                                display: datasets.length > 0,
                                 position: 'bottom',
-                                labels: { boxWidth: 8, font: { size: 10 }, padding: 6 }
+                                labels: { boxWidth: 10, boxHeight: 10, font: { size: 10 }, padding: 8 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const val = Number(context.parsed.y || 0);
+                                        if (val === 0) return null;
+                                        return `${context.dataset.label}: ${val.toLocaleString('ko-KR')}원`;
+                                    }
+                                }
                             }
                         },
                         scales: {
@@ -2404,19 +2428,23 @@ function doPost(e) {
         }
 
         // =========================================================================
-        // 발주서 엑셀/CSV 업로드 & 붙여넣기 파싱
+        // 발주서 업로드 모달 및 엑셀/붙여넣기 파싱
         // =========================================================================
         function openUploadModal() {
-            document.getElementById('uploadDefaultDate').value = getTodayStr();
+            const uDate = document.getElementById('uploadDefaultDate');
+            if (uDate && !uDate.value) uDate.value = getTodayStr();
             const modal = document.getElementById('uploadModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
         }
 
         function closeUploadModal() {
             const modal = document.getElementById('uploadModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            const fileInput = document.getElementById('excelFileInput');
+            if (fileInput) fileInput.value = '';
         }
 
         function switchUploadTab(mode) {
@@ -2425,221 +2453,242 @@ function doPost(e) {
             const panelFile = document.getElementById('uploadFilePanel');
             const panelPaste = document.getElementById('uploadPastePanel');
 
-            if (mode === 'FILE') {
-                btnFile.className = 'flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition';
-                btnPaste.className = 'flex-1 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:text-stone-800 transition';
+            const activeCls = 'flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition';
+            const inactiveCls = 'flex-1 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:text-stone-800 transition';
+
+            if (mode === 'PASTE') {
+                btnFile.className = inactiveCls;
+                btnPaste.className = activeCls;
+                panelFile.classList.add('hidden');
+                panelPaste.classList.remove('hidden');
+            } else {
+                btnFile.className = activeCls;
+                btnPaste.className = inactiveCls;
                 panelFile.classList.remove('hidden');
                 panelPaste.classList.add('hidden');
-            } else {
-                btnPaste.className = 'flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-stone-900 shadow-2xs transition';
-                btnFile.className = 'flex-1 py-1.5 rounded-md text-xs font-medium text-stone-500 hover:text-stone-800 transition';
-                panelPaste.classList.remove('hidden');
-                panelFile.classList.add('hidden');
             }
         }
 
-        function extractDateFromFilename(filename) {
-            const base = String(filename || '');
-            const m8 = base.match(/(20\d{2})[-_.]?(0[1-9]|1[0-2])[-_.]?(0[1-9]|[12]\d|3[01])/);
-            if (m8) return `${m8[1]}-${m8[2]}-${m8[3]}`;
-            const m6 = base.match(/(?:^|\D)(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?:\D|$)/);
-            if (m6) return `20${m6[1]}-${m6[2]}-${m6[3]}`;
+        function extractDateFromFilename(fileName) {
+            const base = String(fileName || '').replace(/\.[^.]+$/, '');
+            const mFull = base.match(/(20\d{2})[-._년\s]*(\d{1,2})[-._월\s]*(\d{1,2})/);
+            if (mFull) {
+                return `${mFull[1]}-${mFull[2].padStart(2, '0')}-${mFull[3].padStart(2, '0')}`;
+            }
+            const mShort = base.match(/(?:^|\D)(\d{2})[-._](\d{1,2})[-._](\d{1,2})(?:\D|$)/);
+            if (mShort) {
+                return `20${mShort[1]}-${mShort[2].padStart(2, '0')}-${mShort[3].padStart(2, '0')}`;
+            }
+            const m6 = base.match(/(?:^|\D)(2\d)(\d{2})(\d{2})(?:\D|$)/);
+            if (m6) {
+                const mm = parseInt(m6[2], 10);
+                const dd = parseInt(m6[3], 10);
+                if (mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) {
+                    return `20${m6[1]}-${m6[2]}-${m6[3]}`;
+                }
+            }
             return null;
         }
 
         async function handleExcelFiles(fileList) {
             if (!fileList || fileList.length === 0) return;
+
             const fallbackDate = normalizeDateStr(document.getElementById('uploadDefaultDate').value || getTodayStr());
             const defaultVendor = String(document.getElementById('uploadDefaultVendor').value || '').trim();
-            let newlyAdded = [];
+            let allNewOrders = [];
 
             for (const file of Array.from(fileList)) {
                 try {
                     const fileDate = extractDateFromFilename(file.name) || fallbackDate;
                     const buffer = await file.arrayBuffer();
-                    const workbook = XLSX.read(buffer, { type: 'array' });
+                    const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
 
                     workbook.SheetNames.forEach(sheetName => {
                         const sheet = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                        const parsed = parseTabularRows(rows, fileDate, defaultVendor);
-                        newlyAdded = newlyAdded.concat(parsed);
+                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: true });
+                        if (rows && rows.length > 0) {
+                            const parsed = parseRowsToOrders(rows, fileDate, defaultVendor);
+                            allNewOrders = allNewOrders.concat(parsed);
+                        }
                     });
                 } catch (err) {
-                    console.error('엑셀 파일 파싱 오류:', err);
-                    showToast(`${file.name} 파일 처리 중 오류가 발생했습니다.`, 'error');
+                    console.error('엑셀 파일 읽기 오류:', err);
+                    showToast(`'${file.name}' 파일을 읽는 중 오류가 발생했습니다.`, 'error');
                 }
             }
 
-            document.getElementById('excelFileInput').value = '';
-            if (newlyAdded.length === 0) {
-                showToast('유효한 발주 수량 데이터를 찾지 못했습니다.', 'error');
+            if (allNewOrders.length === 0) {
+                showToast('인식된 유효 발주 품목(원재료명·수량)이 없습니다.', 'error');
                 return;
             }
 
-            finalizeAddedOrders(newlyAdded);
             closeUploadModal();
+            finalizeAddedOrders(allNewOrders);
         }
 
         function handlePasteSubmit() {
-            const text = document.getElementById('pasteTextarea').value.trim();
-            if (!text) {
-                showToast('붙여넣을 데이터를 입력해 주세요.', 'error');
+            const rawText = document.getElementById('pasteTextarea').value || '';
+            if (!rawText.trim()) {
+                showToast('붙여넣은 발주 표 데이터가 없습니다.', 'error');
                 return;
             }
-            const fallbackDate = normalizeDateStr(document.getElementById('uploadDefaultDate').value || getTodayStr());
-            const defaultVendor = String(document.getElementById('uploadDefaultVendor').value || '').trim();
-            const rows = text.split(/\r?\n/).map(line => line.split('\t'));
-            const parsed = parseTabularRows(rows, fallbackDate, defaultVendor);
 
+            const defaultDate = normalizeDateStr(document.getElementById('uploadDefaultDate').value || getTodayStr());
+            const defaultVendor = String(document.getElementById('uploadDefaultVendor').value || '').trim();
+
+            const rows = rawText
+                .split(/\r?\n/)
+                .filter(line => line.trim() !== '')
+                .map(line => line.includes('\t') ? line.split('\t') : line.split(','));
+
+            const parsed = parseRowsToOrders(rows, defaultDate, defaultVendor);
             if (parsed.length === 0) {
-                showToast('인식 가능한 발주 품목 및 수량이 없습니다.', 'error');
+                showToast('붙여넣은 내용에서 유효한 원재료명과 수량을 찾지 못했습니다.', 'error');
                 return;
             }
 
             document.getElementById('pasteTextarea').value = '';
-            finalizeAddedOrders(parsed);
             closeUploadModal();
+            finalizeAddedOrders(parsed);
         }
 
-        function parseTabularRows(rows, targetDate, defaultVendor = '') {
-            if (!Array.isArray(rows) || rows.length === 0) return [];
+        function parseRowsToOrders(rows, defaultDate, defaultVendor = '') {
+            const result = [];
+            if (!Array.isArray(rows) || rows.length === 0) return result;
 
             let headerRowIdx = -1;
-            let subHeaderRowIdx = -1;
-            let detectedDocVendor = defaultVendor;
-            const colMap = {
-                colA: 0,
-                colB: 1,
-                colC: 2,
-                colD: 3,
-                taxTypeCol: -1,
-                taxFreeCol: -1,
-                taxableCol: -1,
-                unitPriceCol: -1,
-                supplyAmtCol: -1,
-                totalAmtCol: -1,
-                vatCols: new Set()
-            };
+            let metaDate = null;
+            let metaVendor = '';
 
-            const applyHeaderMapping = (row) => {
-                row.forEach((cell, idx) => {
-                    const h = String(cell || '').replace(/\s+/g, '');
-                    if (!h) return;
-                    const hLower = h.toLowerCase();
-
-                    const isVatIncludedHeader = h.includes('포함') || h.includes('합계금액') || h.includes('총합계');
-                    if (!isVatIncludedHeader && (h.includes('부가세') || h.includes('부가가치세') || h.includes('세액') || hLower === 'vat')) {
-                        colMap.vatCols.add(idx);
-                        return;
-                    }
-
-                    if (h.includes('거래처') || h.includes('발주처') || h.includes('매입처') || h.includes('공급처') || h.includes('업체명')) {
-                        colMap.colA = idx;
-                    } else if ((h.includes('분류') || h.includes('카테고리')) && idx < 3) {
-                        colMap.colA = idx;
-                    }
-                    if (h.includes('품명') || h.includes('품목명') || h.includes('원재료명') || h === '품목' || h === '원재료' || h === '상품명') {
-                        colMap.colB = idx;
-                    }
-                    if (h.includes('규격') || h.includes('단위') || h.includes('용량') || h.includes('포장')) {
-                        colMap.colC = idx;
-                    }
-                    if (h.includes('발주수량') || h.includes('주문수량') || h.includes('입고수량') || h.includes('발주량') || h === '수량') {
-                        colMap.colD = idx;
-                    }
-                    if (h.includes('과세구분') || h.includes('면과세') || (h === '구분' && idx > 3)) {
-                        colMap.taxTypeCol = idx;
-                    }
-                    if (h.includes('면세') && !h.includes('과세')) {
-                        colMap.taxFreeCol = idx;
-                    }
-                    if (h.includes('과세') && !h.includes('면세') && !h.includes('구분')) {
-                        colMap.taxableCol = idx;
-                    }
-                    if (h.includes('단가')) {
-                        colMap.unitPriceCol = idx;
-                    }
-                    if (h.includes('공급가') || h.includes('공급금액') || h.includes('발주금액') || h.includes('발주액') || h.includes('매입금액') || h.includes('주문금액') || h === '금액') {
-                        colMap.supplyAmtCol = idx;
-                    } else if (h.includes('합계') || h.includes('총액') || h.includes('총금액') || isVatIncludedHeader) {
-                        colMap.totalAmtCol = idx;
-                    }
-                });
-            };
-
-            for (let r = 0; r < Math.min(rows.length, 20); r++) {
+            const scanLimit = Math.min(rows.length, 20);
+            for (let r = 0; r < scanLimit; r++) {
                 const row = rows[r] || [];
-                const joined = row.map(c => String(c || '').trim()).join(' ');
-                if (!detectedDocVendor) {
-                    const vMatch = joined.match(/(?:거래처|발주처|공급처|매입처|수신)\s*[:：]?\s*([가-힣A-Za-z0-9()주식회사㈜\s]{2,20})/);
-                    if (vMatch && vMatch[1]) {
-                        const cand = vMatch[1].replace(/귀하|담당자|발주서/g, '').trim();
-                        if (cand && cand.length >= 2) detectedDocVendor = cand;
-                    }
+                const joined = row.map(c => String(c ?? '').replace(/\s+/g, '')).join('|');
+
+                if (!metaDate) {
+                    const dm = joined.match(/(20\d{2})[-./년](\d{1,2})[-./월](\d{1,2})/);
+                    if (dm) metaDate = `${dm[1]}-${dm[2].padStart(2, '0')}-${dm[3].padStart(2, '0')}`;
                 }
 
-                const hasItemHeader = row.some(c => /품명|품목|원재료|상품명|제품명/.test(String(c || '')));
-                const hasQtyHeader = row.some(c => /수량|발주량|주문량|입고량/.test(String(c || '')));
-                if (hasItemHeader || (hasQtyHeader && r < 12)) {
-                    headerRowIdx = r;
-                    applyHeaderMapping(row);
+                let score = 0;
+                if (/원재료|품목|품명|상품명|자재명|제품명/.test(joined)) score += 2;
+                if (/수량|발주량|입고량|주문량/.test(joined)) score += 2;
+                if (/규격|단위|단가|공급가|금액|거래처|과세|면세/.test(joined)) score += 1;
 
-                    if (r + 1 < rows.length) {
-                        const nextRow = rows[r + 1] || [];
-                        const nextQty = parseNumeric(nextRow[colMap.colD]);
-                        const hasSubHeaderKeyword = nextRow.some(c => /공급가|부가세|세액|단가|발주금액|면세|과세/.test(String(c || '')));
-                        if (nextQty <= 0 && hasSubHeaderKeyword) {
-                            subHeaderRowIdx = r + 1;
-                            applyHeaderMapping(nextRow);
-                        }
-                    }
+                if (score >= 3) {
+                    headerRowIdx = r;
                     break;
                 }
             }
 
-            const startIdx = subHeaderRowIdx >= 0 ? subHeaderRowIdx + 1 : (headerRowIdx >= 0 ? headerRowIdx + 1 : 0);
-            const result = [];
-            const normalizedDate = normalizeDateStr(targetDate);
+            const colMap = {
+                noCol: -1,
+                dateCol: -1,
+                colA: -1,
+                colB: -1,
+                colC: -1,
+                colD: -1,
+                taxTypeCol: -1,
+                unitPriceCol: -1,
+                supplyAmtCol: -1,
+                taxFreeCol: -1,
+                taxableCol: -1,
+                grossAmtCol: -1,
+                vatCols: new Set()
+            };
 
-            for (let r = startIdx; r < rows.length; r++) {
+            let startRow = 0;
+            if (headerRowIdx >= 0) {
+                const hRow1 = rows[headerRowIdx] || [];
+                const nextRow = rows[headerRowIdx + 1] || [];
+                const nextJoined = nextRow.map(c => String(c ?? '').replace(/\s+/g, '')).join('|');
+                const hasTwoLineHeader = /공급가|부가세|세액|단가|면세|과세/.test(nextJoined) && !nextRow.some(c => typeof c === 'number' && c > 0);
+
+                startRow = headerRowIdx + (hasTwoLineHeader ? 2 : 1);
+                const maxCols = Math.max(hRow1.length, hasTwoLineHeader ? nextRow.length : 0);
+
+                for (let c = 0; c < maxCols; c++) {
+                    const h1 = String(hRow1[c] ?? '').replace(/\s+/g, '').toLowerCase();
+                    const h2 = hasTwoLineHeader ? String(nextRow[c] ?? '').replace(/\s+/g, '').toLowerCase() : '';
+                    const h = `${h1}_${h2}`;
+
+                    if ((/부가세|세액|vat/.test(h)) && !/포함|합계/.test(h)) {
+                        colMap.vatCols.add(c);
+                        continue;
+                    }
+                    if (colMap.noCol === -1 && /^(no|순번|번호)_?$/.test(h)) colMap.noCol = c;
+                    else if (colMap.dateCol === -1 && /발주일|입고일|일자|날짜|date/.test(h)) colMap.dateCol = c;
+                    else if (colMap.colB === -1 && /원재료|품목|품명|상품명|자재명|제품명/.test(h)) colMap.colB = c;
+                    else if (colMap.colA === -1 && /거래처|공급처|매입처|업체|분류|카테고리/.test(h)) colMap.colA = c;
+                    else if (colMap.colC === -1 && /규격|단위|용량|중량/.test(h)) colMap.colC = c;
+                    else if (colMap.colD === -1 && /입고수량|발주수량|주문수량|수량|발주량/.test(h) && !/이전|기존/.test(h)) colMap.colD = c;
+                    else if (colMap.taxTypeCol === -1 && /과세구분|면과세|세구분|^구분_?$/.test(h)) colMap.taxTypeCol = c;
+                    else if (colMap.taxFreeCol === -1 && /면세금액|면세공급가|면세가/.test(h)) colMap.taxFreeCol = c;
+                    else if (colMap.taxableCol === -1 && /과세금액|과세공급가|과세가/.test(h)) colMap.taxableCol = c;
+                    else if (colMap.unitPriceCol === -1 && /단가|개당금액|개당단가/.test(h)) colMap.unitPriceCol = c;
+                    else if (colMap.supplyAmtCol === -1 && /공급가액|공급가|발주금액|매입금액|주문금액/.test(h)) colMap.supplyAmtCol = c;
+                    else if (colMap.grossAmtCol === -1 && /합계금액|총금액|발주합계|합계/.test(h)) colMap.grossAmtCol = c;
+                    else if (colMap.supplyAmtCol === -1 && /금액/.test(h)) colMap.supplyAmtCol = c;
+                }
+            } else {
+                colMap.colA = 0;
+                colMap.colB = 1;
+                colMap.colC = 2;
+                colMap.colD = 3;
+            }
+
+            if (colMap.colB === -1) colMap.colB = colMap.noCol === 0 ? 1 : 0;
+            if (colMap.colD === -1) colMap.colD = Math.min(colMap.colB + 2, 3);
+
+            const baseDate = normalizeDateStr(metaDate || defaultDate || getTodayStr());
+            let carryVendor = defaultVendor || metaVendor || '';
+
+            for (let r = startRow; r < rows.length; r++) {
                 const row = rows[r];
-                if (!row || row.length === 0) continue;
+                if (!Array.isArray(row)) continue;
+
+                const nonEmpty = row.some(cell => String(cell ?? '').trim() !== '');
+                if (!nonEmpty) continue;
 
                 const rawB = String(row[colMap.colB] ?? '').trim();
-                const rawA = String(row[colMap.colA] ?? '').trim();
-                const joinedRow = row.map(c => String(c || '')).join('');
-
-                if (/합\s*계|소\s*계|총\s*계|부가세|총발주/.test(joinedRow) && (/합\s*계|소\s*계|총\s*계/.test(rawB) || /합\s*계|소\s*계|총\s*계/.test(rawA) || !rawB)) {
+                const firstCellsJoined = row.slice(0, 5).map(c => String(c ?? '').replace(/\s+/g, '')).join('|');
+                if (!rawB || /^합계$|^총계$|^소계$|합계금액|원재료명|품목명/.test(rawB) || /합계|소계|총계/.test(firstCellsJoined)) {
                     continue;
                 }
 
                 const qty = parseNumeric(row[colMap.colD]);
-                if (!rawB || qty <= 0) continue;
-                if (/^(품명|품목명|원재료명)$/.test(rawB.replace(/\s+/g, ''))) continue;
+                if (qty <= 0) continue;
 
-                let vendorOrCat = rawA;
-                if (/^\d+$/.test(vendorOrCat)) {
-                    vendorOrCat = detectedDocVendor || '';
-                } else if (!vendorOrCat && detectedDocVendor) {
-                    vendorOrCat = detectedDocVendor;
+                const rawVendorCell = colMap.colA >= 0 ? String(row[colMap.colA] ?? '').trim() : '';
+                if (rawVendorCell && !/^\d+$/.test(rawVendorCell)) {
+                    carryVendor = rawVendorCell;
                 }
+                const vendorOrCat = rawVendorCell || defaultVendor || carryVendor || '';
+                const spec = colMap.colC >= 0 ? String(row[colMap.colC] ?? '').trim() : '';
+                const normalizedDate = (colMap.dateCol >= 0 && String(row[colMap.dateCol] ?? '').trim())
+                    ? normalizeDateStr(row[colMap.dateCol])
+                    : baseDate;
 
-                const spec = String(row[colMap.colC] ?? '').trim();
-
-                let taxFreeAmt = (colMap.taxFreeCol >= 0 && !colMap.vatCols.has(colMap.taxFreeCol)) ? parseNumeric(row[colMap.taxFreeCol]) : 0;
-                let taxableAmt = (colMap.taxableCol >= 0 && !colMap.vatCols.has(colMap.taxableCol)) ? parseNumeric(row[colMap.taxableCol]) : 0;
-                const supplyAmt = (colMap.supplyAmtCol >= 0 && !colMap.vatCols.has(colMap.supplyAmtCol)) ? parseNumeric(row[colMap.supplyAmtCol]) : 0;
-                const grossAmt = (colMap.totalAmtCol >= 0 && !colMap.vatCols.has(colMap.totalAmtCol)) ? parseNumeric(row[colMap.totalAmtCol]) : 0;
-                const unitPrice = colMap.unitPriceCol >= 0 ? parseNumeric(row[colMap.unitPriceCol]) : 0;
+                let unitPrice = colMap.unitPriceCol >= 0 ? parseNumeric(row[colMap.unitPriceCol]) : 0;
+                let supplyAmt = colMap.supplyAmtCol >= 0 ? parseNumeric(row[colMap.supplyAmtCol]) : 0;
+                let taxFreeAmt = colMap.taxFreeCol >= 0 ? parseNumeric(row[colMap.taxFreeCol]) : 0;
+                let taxableAmt = colMap.taxableCol >= 0 ? parseNumeric(row[colMap.taxableCol]) : 0;
+                let grossAmt = colMap.grossAmtCol >= 0 ? parseNumeric(row[colMap.grossAmtCol]) : 0;
 
                 let rowVatAmt = 0;
-                colMap.vatCols.forEach(vIdx => {
-                    rowVatAmt += parseNumeric(row[vIdx]);
+                colMap.vatCols.forEach(vc => {
+                    rowVatAmt += parseNumeric(row[vc]);
                 });
 
+                if (unitPrice > 0 && qty > 1) {
+                    if (taxFreeAmt > 0 && Math.abs(taxFreeAmt - unitPrice * qty) <= 5) taxFreeAmt = unitPrice;
+                    if (taxableAmt > 0 && Math.abs(taxableAmt - unitPrice * qty) <= 5) taxableAmt = unitPrice;
+                }
+
                 let totalAmt = 0;
-                if (supplyAmt > 0) {
+                if (unitPrice > 0) {
+                    totalAmt = unitPrice;
+                } else if (supplyAmt > 0) {
                     totalAmt = supplyAmt;
                 } else if (grossAmt > 0) {
                     if (rowVatAmt > 0 && grossAmt > rowVatAmt && Math.abs((grossAmt - rowVatAmt) * 0.1 - rowVatAmt) <= Math.max(10, grossAmt * 0.01)) {
@@ -2647,10 +2696,6 @@ function doPost(e) {
                     } else {
                         totalAmt = grossAmt;
                     }
-                }
-
-                if (totalAmt === 0 && taxFreeAmt === 0 && taxableAmt === 0 && unitPrice > 0) {
-                    totalAmt = unitPrice * qty;
                 }
 
                 if (taxFreeAmt === 0 && taxableAmt === 0 && totalAmt === 0 && row.length > 4) {
@@ -2666,20 +2711,20 @@ function doPost(e) {
                     if (numCandidates.length === 1) {
                         totalAmt = numCandidates[0].val;
                     } else if (numCandidates.length >= 2) {
-                        let matchedSupply = 0;
+                        let matchedUnit = 0;
                         for (let i = 0; i < numCandidates.length; i++) {
                             for (let j = 0; j < numCandidates.length; j++) {
                                 if (i === j) continue;
                                 if (qty > 1 && Math.abs(numCandidates[i].val * qty - numCandidates[j].val) <= 5) {
-                                    matchedSupply = numCandidates[j].val;
+                                    matchedUnit = numCandidates[i].val;
                                     break;
                                 }
                             }
-                            if (matchedSupply > 0) break;
+                            if (matchedUnit > 0) break;
                         }
 
-                        if (matchedSupply > 0) {
-                            totalAmt = matchedSupply;
+                        if (matchedUnit > 0) {
+                            totalAmt = matchedUnit;
                         } else {
                             const filtered = numCandidates.filter((cand, idx) => {
                                 if (idx === 0) return true;
@@ -2841,10 +2886,7 @@ function doPost(e) {
             const baseQty = (target.prevQty !== null && target.prevQty !== undefined)
                 ? Number(target.prevQty)
                 : Number(target.colD || 0);
-
-            editUnitPriceSnapshot = Number(target.colD) > 0
-                ? (Number(target.amount || 0) / Number(target.colD))
-                : (baseQty > 0 ? (Number(target.amount || 0) / baseQty) : 0);
+            const { unitAmt } = getOrderLineAmounts(target);
 
             document.getElementById('editOrderId').value = target.id;
             document.getElementById('editOrderDateInfo').textContent = `발주일: ${target.date}`;
@@ -2854,8 +2896,9 @@ function doPost(e) {
             document.getElementById('editPrevQtyDisplay').textContent = formatNumber(baseQty);
             document.getElementById('editNewQtyInput').value = target.colD;
             document.getElementById('editTaxType').value = target.taxType === '면세' ? '면세' : '과세';
-            document.getElementById('editNewAmount').value = Math.round(target.amount || 0);
+            document.getElementById('editNewAmount').value = Math.round(unitAmt);
             document.getElementById('editRemarkInput').value = target.colE || '';
+            onEditQtyInputChange();
 
             const modal = document.getElementById('editOrderModal');
             modal.classList.remove('hidden');
@@ -2870,11 +2913,11 @@ function doPost(e) {
         }
 
         function onEditQtyInputChange() {
-            const newQty = parseNumeric(document.getElementById('editNewQtyInput').value);
-            if (editUnitPriceSnapshot > 0 && newQty >= 0) {
-                document.getElementById('editNewAmount').value = Math.round(newQty * editUnitPriceSnapshot);
-            } else if (newQty === 0) {
-                document.getElementById('editNewAmount').value = 0;
+            const newQty = Math.max(0, parseNumeric(document.getElementById('editNewQtyInput').value));
+            const unitAmt = Math.max(0, parseNumeric(document.getElementById('editNewAmount').value));
+            const previewEl = document.getElementById('editLineTotalPreview');
+            if (previewEl) {
+                previewEl.textContent = `${formatNumber(Math.round(unitAmt * newQty))}원`;
             }
         }
 
@@ -3012,7 +3055,7 @@ function doPost(e) {
 
             const headers = [
                 '발주일자', '분류/거래처', '원재료명', '규격/단위', '과세구분',
-                '발주수량', '입고수량', '면세금액', '과세금액', '발주금액', '부가세포함금액', '비고'
+                '발주수량', '입고수량', '발주금액(개당)', '합산금액', '면세금액', '과세금액', '부가세포함금액', '비고'
             ];
 
             const csvEscape = (v) => {
@@ -3024,10 +3067,11 @@ function doPost(e) {
             filtered.forEach(o => {
                 const orderedQty = (o.prevQty !== null && o.prevQty !== undefined) ? o.prevQty : o.colD;
                 const receivedQty = o.colD;
-                const tf = Math.round(Number(o.taxFreeAmount || 0));
-                const tx = Math.round(Number(o.taxableAmount || 0));
-                const amt = Math.round(Number(o.amount || 0));
-                const vatIncluded = Math.round(amt + (tx * 0.1));
+                const { unitAmt, lineTotal, lineTaxFree, lineTaxable } = getOrderLineAmounts(o);
+                const tf = Math.round(lineTaxFree);
+                const tx = Math.round(lineTaxable);
+                const totalLine = Math.round(lineTotal);
+                const vatIncluded = Math.round(lineTotal + (lineTaxable * 0.1));
 
                 lines.push([
                     csvEscape(o.date),
@@ -3037,9 +3081,10 @@ function doPost(e) {
                     csvEscape(o.taxType || '과세'),
                     orderedQty,
                     receivedQty,
+                    Math.round(unitAmt),
+                    totalLine,
                     tf,
                     tx,
-                    amt,
                     vatIncluded,
                     csvEscape(o.colE || '')
                 ].join(','));
