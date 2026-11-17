@@ -570,8 +570,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="font-bold text-stone-600 block mb-1">원재료명 (품명)</label>
-                    <input type="text" id="m_item" placeholder="예: 강력분(메티에)" class="w-full border border-stone-300 rounded-xl px-3 py-2 font-bold">
+                    <label class="font-bold text-stone-600 block mb-1">원재료명</label>
+                    <input type="text" id="m_item" placeholder="예: 포리쉐 T45" class="w-full border border-stone-300 rounded-xl px-3 py-2 font-bold">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -589,7 +589,7 @@
                         <input type="date" id="m_expiry" class="w-full border border-stone-300 rounded-xl px-3 py-2">
                     </div>
                     <div>
-                        <label class="font-bold text-stone-600 block mb-1">제조원 (HACCP · 미입력 시 이전 제조원 승계)</label>
+                        <label class="font-bold text-stone-600 block mb-1 whitespace-nowrap">제조원 (미입력 시 이전 승계)</label>
                         <input type="text" id="m_mfg" placeholder="예: 대한제분, 서울우유" class="w-full border border-stone-300 rounded-xl px-3 py-2">
                     </div>
                 </div>
@@ -1822,25 +1822,25 @@
 
                 container.innerHTML = `
                     <div class="overflow-x-auto border border-stone-200 rounded-2xl">
-                        <table class="w-full table-fixed min-w-[860px] text-left border-collapse text-xs">
+                        <table class="w-full table-fixed min-w-[900px] text-left border-collapse text-xs">
                             <colgroup>
                                 <col class="w-[11%]">
-                                <col class="w-[20%]">
-                                <col class="w-[10%]">
-                                <col class="w-[10%]">
-                                <col class="w-[17%]">
+                                <col class="w-[18%]">
+                                <col class="w-[8%]">
+                                <col class="w-[9%]">
+                                <col class="w-[15%]">
                                 <col class="w-[11%]">
-                                <col class="w-[11%]">
-                                <col class="w-[10%]">
+                                <col class="w-[15%]">
+                                <col class="w-[13%]">
                             </colgroup>
                             <thead>
-                                <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600">
+                                <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 whitespace-nowrap">
                                     <th class="py-2.5 px-3">거래처</th>
                                     <th class="py-2.5 px-3">원재료명</th>
-                                    <th class="py-2.5 px-2">규격</th>
-                                    <th class="py-2.5 px-2 text-right">가용 현재고</th>
+                                    <th class="py-2.5 px-2 text-center">규격</th>
+                                    <th class="py-2.5 px-2 text-center">가용 현재고</th>
                                     <th class="py-2.5 px-2 text-center bg-amber-100/70 text-amber-950">금일 사용수량 입력</th>
-                                    <th class="py-2.5 px-2 text-right">차감 후 잔여재고</th>
+                                    <th class="py-2.5 px-2 text-center">차감 후 잔여재고</th>
                                     <th class="py-2.5 px-2.5 text-right">소진 금액(단가기준)</th>
                                     <th class="py-2.5 px-2">품목 비고</th>
                                 </tr>
@@ -1853,25 +1853,25 @@
                                     const usedCost = Math.round(useQty * st.unitAmt);
                                     const isSelected = useQty > 0;
                                     return `
-                                        <tr class="border-b border-stone-100 transition ${isSelected ? 'bg-amber-50/70' : 'hover:bg-stone-50'}">
-                                            <td class="py-2 px-3 font-bold text-stone-700 truncate">${escapeHtml(st.vendor)}</td>
-                                            <td class="py-2 px-3 font-extrabold text-stone-900 truncate">
-                                                ${escapeHtml(st.item)}
-                                                ${st.earliestExpiry ? `<span class="block text-[10px] font-semibold text-stone-400">임박기한: ${escapeHtml(st.earliestExpiry)}</span>` : ''}
+                                        <tr class="border-b border-stone-100 transition whitespace-nowrap ${isSelected ? 'bg-amber-50/70' : 'hover:bg-stone-50'}">
+                                            <td class="py-2 px-3 font-bold text-stone-700 truncate" title="${escapeHtml(st.vendor)}">${escapeHtml(st.vendor)}</td>
+                                            <td class="py-2 px-3 font-extrabold text-stone-900 truncate" title="${escapeHtml(st.item)}${st.earliestExpiry ? ' (임박기한: ' + escapeHtml(st.earliestExpiry) + ')' : ''}">
+                                                <span>${escapeHtml(st.item)}</span>
+                                                ${st.earliestExpiry ? `<span class="ml-1.5 text-[10px] font-semibold text-stone-400">(${escapeHtml(st.earliestExpiry)})</span>` : ''}
                                             </td>
-                                            <td class="py-2 px-2 text-stone-600 truncate">${escapeHtml(st.spec)}</td>
-                                            <td class="py-2 px-2 text-right font-extrabold text-emerald-800">${formatNumber(st.totalRemainQty)}</td>
-                                            <td class="py-2 px-2 bg-amber-50/40">
+                                            <td class="py-2 px-2 text-center text-stone-600 truncate" title="${escapeHtml(st.spec)}">${escapeHtml(st.spec)}</td>
+                                            <td class="py-2 px-2 text-center font-extrabold text-emerald-800 whitespace-nowrap">${formatNumber(st.totalRemainQty)}</td>
+                                            <td class="py-2 px-2 bg-amber-50/40 whitespace-nowrap">
                                                 <div class="flex items-center justify-center gap-1">
-                                                    <button type="button" onclick="adjustPendingUsageQty('${escapeHtml(st.key)}', -1, ${st.totalRemainQty})" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">-</button>
-                                                    <input type="number" step="any" min="0" max="${st.totalRemainQty}" value="${useQty > 0 ? useQty : ''}" placeholder="0" onchange="setPendingUsageQty('${escapeHtml(st.key)}', this.value)" class="no-spinner w-14 text-center font-extrabold border ${isSelected ? 'border-amber-600 bg-amber-100/50 text-amber-950' : 'border-stone-300 bg-white text-stone-900'} rounded-lg py-1 px-1 focus:outline-none focus:border-amber-600">
-                                                    <button type="button" onclick="adjustPendingUsageQty('${escapeHtml(st.key)}', 1, ${st.totalRemainQty})" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">+</button>
+                                                    <button type="button" onclick="adjustPendingUsageQty('${escapeHtml(st.key)}', -1, ${st.totalRemainQty})" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer shrink-0">-</button>
+                                                    <input type="number" step="any" min="0" max="${st.totalRemainQty}" value="${useQty > 0 ? useQty : ''}" placeholder="0" onchange="setPendingUsageQty('${escapeHtml(st.key)}', this.value)" class="no-spinner w-14 text-center font-extrabold border ${isSelected ? 'border-amber-600 bg-amber-100/50 text-amber-950' : 'border-stone-300 bg-white text-stone-900'} rounded-lg py-1 px-1 focus:outline-none focus:border-amber-600 shrink-0">
+                                                    <button type="button" onclick="adjustPendingUsageQty('${escapeHtml(st.key)}', 1, ${st.totalRemainQty})" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer shrink-0">+</button>
                                                 </div>
                                             </td>
-                                            <td class="py-2 px-2 text-right font-extrabold ${afterRemain < 0 ? 'text-rose-600' : (isSelected ? 'text-amber-900' : 'text-stone-500')}">
+                                            <td class="py-2 px-2 text-center font-extrabold whitespace-nowrap ${afterRemain < 0 ? 'text-rose-600' : (isSelected ? 'text-amber-900' : 'text-stone-500')}">
                                                 ${formatNumber(afterRemain)}
                                             </td>
-                                            <td class="py-2 px-2.5 text-right font-bold ${isSelected ? 'text-amber-900 font-extrabold' : 'text-stone-400'}">
+                                            <td class="py-2 px-2.5 text-right font-bold whitespace-nowrap ${isSelected ? 'text-amber-900 font-extrabold' : 'text-stone-400'}">
                                                 ${isSelected ? formatCurrency(usedCost) : formatCurrency(st.unitAmt) + '/개'}
                                             </td>
                                             <td class="py-2 px-2">
@@ -1925,13 +1925,23 @@
                                 <span class="text-xs font-extrabold text-amber-900">일일 소진 금액 합계: ${formatCurrency(dayAmt)}</span>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse text-xs">
+                                <table class="w-full table-fixed min-w-[860px] text-left border-collapse text-xs">
+                                    <colgroup>
+                                        <col class="w-[12%]">
+                                        <col class="w-[20%]">
+                                        <col class="w-[9%]">
+                                        <col class="w-[9%]">
+                                        <col class="w-[12%]">
+                                        <col class="w-[13%]">
+                                        <col class="w-[16%]">
+                                        <col class="w-[9%]">
+                                    </colgroup>
                                     <thead>
-                                        <tr class="bg-stone-50 border-b border-stone-200 font-extrabold text-stone-500">
+                                        <tr class="bg-stone-50 border-b border-stone-200 font-extrabold text-stone-500 whitespace-nowrap">
                                             <th class="py-2 px-3">거래처</th>
                                             <th class="py-2 px-3">원재료명</th>
-                                            <th class="py-2 px-2">규격</th>
-                                            <th class="py-2 px-2 text-right">사용 수량</th>
+                                            <th class="py-2 px-2 text-center">규격</th>
+                                            <th class="py-2 px-2 text-center">사용 수량</th>
                                             <th class="py-2 px-2.5 text-right">기준 단가</th>
                                             <th class="py-2 px-2.5 text-right">소진 합산금액</th>
                                             <th class="py-2 px-3">담당자 / 비고</th>
@@ -1940,16 +1950,16 @@
                                     </thead>
                                     <tbody>
                                         ${list.map(u => `
-                                            <tr class="border-b border-stone-100 hover:bg-stone-50">
-                                                <td class="py-2 px-3 font-bold text-stone-700">${escapeHtml(u.vendor)}</td>
-                                                <td class="py-2 px-3 font-extrabold text-stone-900">${escapeHtml(u.item)}</td>
-                                                <td class="py-2 px-2 text-stone-600">${escapeHtml(u.spec)}</td>
-                                                <td class="py-2 px-2 text-right font-extrabold text-rose-700">-${formatNumber(u.usedQty)}</td>
-                                                <td class="py-2 px-2.5 text-right text-stone-600">${formatCurrency(u.unitAmt)}</td>
-                                                <td class="py-2 px-2.5 text-right font-extrabold text-stone-900">${formatCurrency(u.totalAmt)}</td>
-                                                <td class="py-2 px-3 text-stone-600">${escapeHtml(u.memo || '-')}</td>
-                                                <td class="py-2 px-2 text-center">
-                                                    <button type="button" onclick="revertSingleUsageLog('${escapeHtml(u.id)}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold cursor-pointer">취소·원복</button>
+                                            <tr class="border-b border-stone-100 hover:bg-stone-50 whitespace-nowrap">
+                                                <td class="py-2 px-3 font-bold text-stone-700 truncate" title="${escapeHtml(u.vendor)}">${escapeHtml(u.vendor)}</td>
+                                                <td class="py-2 px-3 font-extrabold text-stone-900 truncate" title="${escapeHtml(u.item)}">${escapeHtml(u.item)}</td>
+                                                <td class="py-2 px-2 text-center text-stone-600 truncate" title="${escapeHtml(u.spec)}">${escapeHtml(u.spec)}</td>
+                                                <td class="py-2 px-2 text-center font-extrabold text-rose-700 whitespace-nowrap">-${formatNumber(u.usedQty)}</td>
+                                                <td class="py-2 px-2.5 text-right text-stone-600 whitespace-nowrap">${formatCurrency(u.unitAmt)}</td>
+                                                <td class="py-2 px-2.5 text-right font-extrabold text-stone-900 whitespace-nowrap">${formatCurrency(u.totalAmt)}</td>
+                                                <td class="py-2 px-3 text-stone-600 truncate" title="${escapeHtml(u.memo || '-')}">${escapeHtml(u.memo || '-')}</td>
+                                                <td class="py-2 px-2 text-center whitespace-nowrap">
+                                                    <button type="button" onclick="revertSingleUsageLog('${escapeHtml(u.id)}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold cursor-pointer whitespace-nowrap">취소·원복</button>
                                                 </td>
                                             </tr>
                                         `).join('')}
@@ -2078,13 +2088,13 @@
                         <tr class="border-b border-stone-100 hover:bg-stone-50/80 transition text-xs">
                             <td class="py-2 px-2.5 font-bold text-stone-700 truncate">${escapeHtml(o.colA)}</td>
                             <td class="py-2 px-2.5 font-extrabold text-stone-900 truncate">${escapeHtml(o.colB)}</td>
-                            <td class="py-2 px-2 text-stone-600 truncate">${escapeHtml(o.colC)}</td>
-                            <td class="py-2 px-2 text-right font-extrabold text-stone-900">${formatNumber(qty)}</td>
+                            <td class="py-2 px-2 text-center text-stone-600 truncate">${escapeHtml(o.colC)}</td>
+                            <td class="py-2 px-2 text-center font-extrabold text-stone-900">${formatNumber(qty)}</td>
                             <td class="py-2 px-2 text-center">${taxBadge}</td>
                             <td class="py-2 px-2.5 text-right font-bold text-stone-800 whitespace-nowrap">${diffArrowHtml}${formatCurrency(unitAmt)}</td>
                             <td class="py-2 px-2.5 text-right font-extrabold text-amber-900 whitespace-nowrap">${formatCurrency(totalAmt)}</td>
                             <td class="py-2 px-2 text-center">
-                                <input type="date" value="${escapeHtml(expVal)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-1 bg-white text-stone-700 focus:border-amber-500 focus:outline-none w-[118px]">
+                                <input type="date" value="${escapeHtml(expVal)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-2 py-1 bg-white text-stone-700 focus:border-amber-500 focus:outline-none w-[128px]">
                             </td>
                             <td class="py-2 px-2 text-center text-stone-700 truncate" title="${escapeHtml(mfgText || '-')}">${noteCellHtml}</td>
                             <td class="py-2 px-2 text-center">
@@ -2114,22 +2124,22 @@
                             <table class="w-full table-fixed min-w-[900px] text-left border-collapse">
                                 <colgroup>
                                     <col class="w-[10%]">
-                                    <col class="w-[17%]">
-                                    <col class="w-[8%]">
+                                    <col class="w-[16%]">
+                                    <col class="w-[7%]">
                                     <col class="w-[6%]">
                                     <col class="w-[6%]">
                                     <col class="w-[11%]">
                                     <col class="w-[11%]">
+                                    <col class="w-[16%]">
                                     <col class="w-[13%]">
-                                    <col class="w-[14%]">
                                     <col class="w-[4%]">
                                 </colgroup>
                                 <thead>
                                     <tr class="bg-stone-50 border-b border-stone-200 text-[11px] font-extrabold text-stone-500">
                                         <th class="py-2 px-2.5">거래처</th>
                                         <th class="py-2 px-2.5">원재료명</th>
-                                        <th class="py-2 px-2">규격</th>
-                                        <th class="py-2 px-2 text-right">수량</th>
+                                        <th class="py-2 px-2 text-center">규격</th>
+                                        <th class="py-2 px-2 text-center">수량</th>
                                         <th class="py-2 px-2 text-center">구분</th>
                                         <th class="py-2 px-2.5 text-right">발주금액(단가)</th>
                                         <th class="py-2 px-2.5 text-right">합산금액</th>
@@ -2168,7 +2178,7 @@
                                 <th class="py-2.5 px-3">순위</th>
                                 <th class="py-2.5 px-3">거래처명</th>
                                 <th class="py-2.5 px-3 text-right">발주건수</th>
-                                <th class="py-2.5 px-3 text-right">총 수량</th>
+                                <th class="py-2.5 px-3 text-center">총 수량</th>
                                 <th class="py-2.5 px-3 text-right">과세 공급가</th>
                                 <th class="py-2.5 px-3 text-right">면세 합계</th>
                                 <th class="py-2.5 px-3 text-right">총 공급가 합계</th>
@@ -2183,7 +2193,7 @@
                                         <td class="py-2.5 px-3 font-bold text-stone-500">${i + 1}</td>
                                         <td class="py-2.5 px-3 font-extrabold text-stone-900">${escapeHtml(r.vendor)}</td>
                                         <td class="py-2.5 px-3 text-right font-bold">${formatNumber(r.count)}건</td>
-                                        <td class="py-2.5 px-3 text-right">${formatNumber(r.qty)}</td>
+                                        <td class="py-2.5 px-3 text-center font-extrabold text-stone-900">${formatNumber(r.qty)}</td>
                                         <td class="py-2.5 px-3 text-right text-blue-700 font-semibold">${formatCurrency(r.taxable)}</td>
                                         <td class="py-2.5 px-3 text-right text-emerald-700 font-semibold">${formatCurrency(r.taxFree)}</td>
                                         <td class="py-2.5 px-3 text-right font-extrabold text-stone-900">${formatCurrency(r.supply)}</td>
@@ -2219,10 +2229,10 @@
                             <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600">
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명</th>
-                                <th class="py-2.5 px-3">규격</th>
+                                <th class="py-2.5 px-3 text-center">규격</th>
                                 <th class="py-2.5 px-3 text-center">과/면세</th>
                                 <th class="py-2.5 px-3 text-right">발주횟수</th>
-                                <th class="py-2.5 px-3 text-right">누적 수량</th>
+                                <th class="py-2.5 px-3 text-center">누적 수량</th>
                                 <th class="py-2.5 px-3 text-right">최근 단가</th>
                                 <th class="py-2.5 px-3 text-right">누적 공급가 합계</th>
                             </tr>
@@ -2232,12 +2242,12 @@
                                 <tr class="border-b border-stone-100 hover:bg-stone-50">
                                     <td class="py-2.5 px-3 font-bold text-stone-600">${escapeHtml(r.vendor)}</td>
                                     <td class="py-2.5 px-3 font-extrabold text-stone-900">${escapeHtml(r.item)}</td>
-                                    <td class="py-2.5 px-3 text-stone-600">${escapeHtml(r.spec)}</td>
+                                    <td class="py-2.5 px-3 text-center text-stone-600">${escapeHtml(r.spec)}</td>
                                     <td class="py-2.5 px-3 text-center">
                                         <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${r.taxType}</span>
                                     </td>
                                     <td class="py-2.5 px-3 text-right">${formatNumber(r.count)}회</td>
-                                    <td class="py-2.5 px-3 text-right font-extrabold text-stone-900">${formatNumber(r.qty)}</td>
+                                    <td class="py-2.5 px-3 text-center font-extrabold text-stone-900">${formatNumber(r.qty)}</td>
                                     <td class="py-2.5 px-3 text-right font-bold">${formatCurrency(r.latestUnit)}</td>
                                     <td class="py-2.5 px-3 text-right font-extrabold text-amber-900">${formatCurrency(r.supply)}</td>
                                 </tr>
@@ -2337,27 +2347,27 @@
 
             container.innerHTML = `
                 <div class="overflow-x-auto border border-stone-200 rounded-2xl">
-                    <table class="w-full table-fixed min-w-[860px] text-left border-collapse text-xs">
+                    <table class="w-full table-fixed min-w-[880px] text-left border-collapse text-xs">
                         <colgroup>
-                            <col class="w-[12%]">
-                            <col class="w-[20%]">
-                            <col class="w-[10%]">
-                            <col class="w-[17%]">
+                            <col class="w-[11%]">
+                            <col class="w-[18%]">
                             <col class="w-[8%]">
+                            <col class="w-[12%]">
+                            <col class="w-[7%]">
                             <col class="w-[12%]">
                             <col class="w-[13%]">
-                            <col class="w-[8%]">
+                            <col class="w-[19%]">
                         </colgroup>
                         <thead>
                             <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 whitespace-nowrap">
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명</th>
-                                <th class="py-2.5 px-2">규격</th>
-                                <th class="py-2.5 px-2 text-center bg-emerald-100/70 text-emerald-950">현재고 (실사 조정)</th>
+                                <th class="py-2.5 px-2 text-center">규격</th>
+                                <th class="py-2.5 px-1.5 text-center bg-emerald-100/70 text-emerald-950">현재고 (실사 조정)</th>
                                 <th class="py-2.5 px-2 text-center">과/면세</th>
                                 <th class="py-2.5 px-2.5 text-right">발주금액(단가)</th>
                                 <th class="py-2.5 px-2.5 text-right">재고 합산금액</th>
-                                <th class="py-2.5 px-2 text-center">소비기한</th>
+                                <th class="py-2.5 px-2.5 text-center">소비기한</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2374,22 +2384,24 @@
                                             ${escapeHtml(o.colB)}
                                             <span class="block text-[10px] font-semibold text-stone-400">발주일: ${escapeHtml(o.date || '-')}</span>
                                         </td>
-                                        <td class="py-2 px-2 text-stone-600 truncate">${escapeHtml(o.colC)}</td>
-                                        <td class="py-2 px-2 bg-emerald-50/40">
+                                        <td class="py-2 px-2 text-center text-stone-600 truncate">${escapeHtml(o.colC)}</td>
+                                        <td class="py-2 px-1.5 bg-emerald-50/40 whitespace-nowrap">
                                             <div class="flex items-center justify-center gap-1">
-                                                <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', -1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">-</button>
-                                                <input type="number" step="any" min="0" value="${rem}" onchange="setRemainQty('${escapeHtml(o.id)}', this.value)" class="no-spinner w-14 text-center font-extrabold border border-stone-300 rounded-lg py-1 px-1 bg-white text-stone-900 focus:outline-none focus:border-emerald-600">
-                                                <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', 1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">+</button>
+                                                <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', -1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer shrink-0">-</button>
+                                                <input type="number" step="any" min="0" value="${rem}" onchange="setRemainQty('${escapeHtml(o.id)}', this.value)" class="no-spinner w-12 text-center font-extrabold border border-stone-300 rounded-lg py-1 px-1 bg-white text-stone-900 focus:outline-none focus:border-emerald-600 shrink-0">
+                                                <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', 1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer shrink-0">+</button>
                                             </div>
                                         </td>
-                                        <td class="py-2 px-2 text-center">
+                                        <td class="py-2 px-2 text-center whitespace-nowrap">
                                             <span class="px-2 py-0.5 rounded text-[11px] font-bold ${taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${taxType}</span>
                                         </td>
                                         <td class="py-2 px-2.5 text-right font-bold text-stone-700 whitespace-nowrap">${formatCurrency(unitAmt)}</td>
                                         <td class="py-2 px-2.5 text-right font-extrabold text-emerald-900 whitespace-nowrap">${formatCurrency(rowSupply)}</td>
-                                        <td class="py-2 px-2 text-center">
-                                            <input type="date" value="${escapeHtml(expStr)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-0.5 bg-white text-stone-700 w-[114px]">
-                                            <span class="block mt-0.5 px-1.5 py-0.2 rounded text-[10px] border ${expInfo.badgeClass}">${expInfo.label}</span>
+                                        <td class="py-2 px-2 text-center whitespace-nowrap">
+                                            <div class="inline-flex flex-col items-center w-[128px] gap-1">
+                                                <input type="date" value="${escapeHtml(expStr)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-2 py-0.5 bg-white text-stone-700 w-full">
+                                                <span class="block w-full py-0.5 rounded-lg text-[10px] text-center border whitespace-nowrap ${expInfo.badgeClass}">${expInfo.label}</span>
+                                            </div>
                                         </td>
                                     </tr>
                                 `;
@@ -2556,7 +2568,7 @@
                             <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 whitespace-nowrap">
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명</th>
-                                <th class="py-2.5 px-2">규격</th>
+                                <th class="py-2.5 px-2 text-center">규격</th>
                                 <th class="py-2.5 px-2.5 text-center">현재 제조원 (HACCP)</th>
                                 <th class="py-2.5 px-2 text-center">과/면세</th>
                                 <th class="py-2.5 px-2.5 text-right">직전 단가</th>
@@ -2597,7 +2609,7 @@
                                     <tr class="border-b border-stone-100 hover:bg-stone-50 whitespace-nowrap">
                                         <td class="py-2.5 px-3 font-bold text-stone-700 truncate" title="${escapeHtml(it.vendor)}">${escapeHtml(it.vendor)}</td>
                                         <td class="py-2.5 px-3 font-extrabold text-stone-900 truncate" title="${escapeHtml(it.item)}">${escapeHtml(it.item)}</td>
-                                        <td class="py-2.5 px-2 text-stone-600 truncate" title="${escapeHtml(it.spec)}">${escapeHtml(it.spec)}</td>
+                                        <td class="py-2.5 px-2 text-center text-stone-600 truncate" title="${escapeHtml(it.spec)}">${escapeHtml(it.spec)}</td>
                                         <td class="py-2.5 px-2.5 text-center truncate" title="${escapeHtml(mfgTooltip)}">${mfgCellHtml}</td>
                                         <td class="py-2.5 px-2 text-center">
                                             <span class="px-2 py-0.5 rounded text-[11px] font-bold ${it.taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${it.taxType}</span>
@@ -2705,23 +2717,65 @@
                 return;
             }
 
-            // 단가 워크스페이스일 때: 변동폭 상위 품목 그래프
+            // 단가 워크스페이스일 때: 품목명이 겹치지 않도록 가로형(Horizontal) 막대그래프로 표시
             if (activeWorkspace === 'PRICE') {
                 titleEl.textContent = '품목별 최근 단가 변동률(%) TOP 8';
-                subEl.textContent = '직전 단가 대비 등락률(%) 비교';
+                subEl.textContent = '좌측 품목명 기준 직전 단가 대비 등락률(%) 비교';
                 const topChanged = getFilteredPriceCatalogList().slice(0, 8);
                 mainChartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: topChanged.map(i => i.item.length > 8 ? i.item.slice(0, 8) + '…' : i.item),
+                        labels: topChanged.map(i => i.item.length > 12 ? i.item.slice(0, 12) + '…' : i.item),
                         datasets: [{
                             label: '단가 변동률(%)',
                             data: topChanged.map(i => Number(i.diffPct.toFixed(1))),
-                            backgroundColor: topChanged.map(i => i.diffPct >= 0 ? 'rgba(225, 29, 72, 0.8)' : 'rgba(37, 99, 235, 0.8)'),
-                            borderRadius: 6
+                            backgroundColor: topChanged.map(i => i.diffPct > 0 ? 'rgba(225, 29, 72, 0.82)' : (i.diffPct < 0 ? 'rgba(37, 99, 235, 0.82)' : 'rgba(120, 113, 108, 0.45)')),
+                            borderRadius: 5,
+                            barThickness: 16
                         }]
                     },
-                    options: getNoWrapChartOptions('%')
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(items) {
+                                        const idx = items[0]?.dataIndex;
+                                        const target = topChanged[idx];
+                                        return target ? `${target.item} (${target.spec})` : '';
+                                    },
+                                    label: function(context) {
+                                        const idx = context.dataIndex;
+                                        const target = topChanged[idx];
+                                        const val = context.parsed.x;
+                                        const sign = val > 0 ? '+' : '';
+                                        if (!target) return `${sign}${val}%`;
+                                        return `변동률: ${sign}${val}% (${formatCurrency(target.prevUnit)} → ${formatCurrency(target.latestUnit)})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#f5f5f4' },
+                                ticks: {
+                                    font: { size: 10 },
+                                    callback: function(v) { return (v > 0 ? '+' : '') + v + '%'; }
+                                }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: {
+                                    autoSkip: false,
+                                    font: { size: 11, weight: 'bold' },
+                                    color: '#292524'
+                                }
+                            }
+                        }
+                    }
                 });
                 return;
             }
@@ -3236,9 +3290,9 @@
                         <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 sticky top-0">
                             <th class="py-2 px-2.5">거래처</th>
                             <th class="py-2 px-2.5">원재료명</th>
-                            <th class="py-2 px-2">규격</th>
+                            <th class="py-2 px-2 text-center">규격</th>
                             <th class="py-2 px-2 text-center">구분</th>
-                            <th class="py-2 px-2 text-right">확정 재고수량</th>
+                            <th class="py-2 px-2 text-center">확정 재고수량</th>
                             <th class="py-2 px-2.5 text-right">단가</th>
                             <th class="py-2 px-2.5 text-right">합산금액</th>
                             <th class="py-2 px-2 text-center">소비기한</th>
@@ -3250,7 +3304,7 @@
                             <tr class="border-b border-stone-100 hover:bg-stone-50">
                                 <td class="py-1.5 px-2.5 font-bold">${escapeHtml(it.vendor)}</td>
                                 <td class="py-1.5 px-2.5 font-extrabold text-stone-900">${escapeHtml(it.item)}</td>
-                                <td class="py-1.5 px-2 text-stone-600">${escapeHtml(it.spec)}</td>
+                                <td class="py-1.5 px-2 text-center text-stone-600">${escapeHtml(it.spec)}</td>
                                 <td class="py-1.5 px-2 text-center">
                                     ${isSnapshotEditMode
                                         ? `<select onchange="updateTempSnapshotItem(${idx}, 'taxType', this.value)" class="border border-stone-300 rounded px-1 py-0.5 text-[11px] font-bold bg-white">
@@ -3260,9 +3314,9 @@
                                         : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${it.taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${escapeHtml(it.taxType)}</span>`
                                     }
                                 </td>
-                                <td class="py-1.5 px-2 text-right font-extrabold">
+                                <td class="py-1.5 px-2 text-center font-extrabold">
                                     ${isSnapshotEditMode
-                                        ? `<input type="number" step="any" value="${it.remainQty}" onchange="updateTempSnapshotItem(${idx}, 'remainQty', this.value)" class="w-16 text-right border border-amber-400 rounded px-1.5 py-0.5 font-extrabold bg-amber-50/40">`
+                                        ? `<input type="number" step="any" value="${it.remainQty}" onchange="updateTempSnapshotItem(${idx}, 'remainQty', this.value)" class="no-spinner w-16 text-center border border-amber-400 rounded px-1.5 py-0.5 font-extrabold bg-amber-50/40">`
                                         : formatNumber(it.remainQty)
                                     }
                                 </td>
@@ -3771,7 +3825,7 @@
             const pureNote = document.getElementById('m_note').value.trim();
 
             if (!colB) {
-                showToast('원재료명(품명)을 입력해 주세요.', 'error');
+                showToast('원재료명을 입력해 주세요.', 'error');
                 return;
             }
             const newOrder = {
