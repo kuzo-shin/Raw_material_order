@@ -38,6 +38,20 @@
         input.no-spinner[type=number] {
             -moz-appearance: textfield;
         }
+        /* 소비기한 date input 내부 연도-월-일 텍스트 우측 정렬 */
+        input[type="date"].expiry-input {
+            text-align: right;
+        }
+        input[type="date"].expiry-input::-webkit-datetime-edit {
+            display: inline-flex;
+            justify-content: flex-end;
+            text-align: right;
+            width: 100%;
+        }
+        input[type="date"].expiry-input::-webkit-datetime-edit-fields-wrapper {
+            display: inline-flex;
+            justify-content: flex-end;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -54,9 +68,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-stone-900">바로가 공장 원재료 통합 관리 시스템</h1>
-                        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-200">v1.9.0</span>
+                        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-200">v2.0.0</span>
                     </div>
-                    <p class="text-xs text-stone-500 hidden sm:block">발주 이력 분석 · 일일 생산 원재료 사용 보고 · 실사 재고 및 단가 트래킹</p>
+                    <p class="text-xs text-stone-500 hidden sm:block">발주 이력 분석 · HACCP 제조원 추적 · 일일 사용 보고 · 실사 재고 및 단가 트래킹</p>
                 </div>
             </div>
 
@@ -324,17 +338,18 @@
                 <!-- 3. 제품 단가 · 변동 이력 전용 검색 툴바 -->
                 <div id="priceToolbar" class="hidden px-4 py-2.5 border-b border-stone-200 bg-amber-50/40 flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-extrabold text-stone-700">원재료 표준 단가 카탈로그 및 변동률(%) 분석</span>
+                        <span class="text-xs font-extrabold text-stone-700">원재료 표준 단가 · HACCP 제조원 변동 이력 분석</span>
                         <select id="priceChangeFilterSelect" onchange="renderDashboard()" class="text-xs font-bold border border-stone-300 rounded-xl px-2.5 py-1 bg-white text-stone-700">
                             <option value="ALL">전체 품목 보기</option>
-                            <option value="CHANGED">단가 변동 있는 품목만</option>
+                            <option value="CHANGED">단가 또는 제조원 변동 품목만</option>
+                            <option value="MFG_CHANGED">제조원 변경 품목만 (HACCP)</option>
                             <option value="UP">최근 단가 인상(▲) 품목</option>
                             <option value="DOWN">최근 단가 인하(▼) 품목</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="relative">
-                            <input type="text" id="priceSearchInput" oninput="renderDashboard()" placeholder="제품명·거래처·규격 검색..." class="text-xs border border-stone-300 rounded-xl pl-7 pr-6 py-1.5 w-52 bg-white focus:outline-none focus:border-amber-600">
+                            <input type="text" id="priceSearchInput" oninput="renderDashboard()" placeholder="제품명·거래처·제조원·규격 검색..." class="text-xs border border-stone-300 rounded-xl pl-7 pr-6 py-1.5 w-56 bg-white focus:outline-none focus:border-amber-600">
                             <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2"></i>
                         </div>
                     </div>
@@ -410,9 +425,9 @@
             </div>
             <div class="mt-4 space-y-3">
                 <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 text-xs text-amber-950 space-y-1">
-                    <p class="font-bold">바로가 발주서 표준 양식 자동 인식 (다중 파일 선택 가능)</p>
+                    <p class="font-bold">바로가 발주서 표준 양식 자동 인식 (다중 파일 선택 가능 · HACCP 제조원 지원)</p>
                     <p class="text-amber-800">파일명 예: <code class="font-mono bg-white px-1 rounded">261001_원재료 발주서.xlsx</code> → 자동으로 <strong class="underline">2026-10-01</strong> 일자로 등록됩니다.</p>
-                    <p class="text-amber-800">A열(구분/거래처) · B열(품명) · C열(규격) · D열(발주수량) · E열(입고일정) · F열(면세단가) · G열(과세단가)</p>
+                    <p class="text-amber-800">A열(구분/거래처) · B열(품명) · C열(규격) · D열(발주수량) · E열(입고일정) · F열(면세) · G열(과세) · H열(부가세) · <strong>I열(제조원)</strong></p>
                 </div>
 
                 <div>
@@ -574,9 +589,13 @@
                         <input type="date" id="m_expiry" class="w-full border border-stone-300 rounded-xl px-3 py-2">
                     </div>
                     <div>
-                        <label class="font-bold text-stone-600 block mb-1">비고 / 입고일정</label>
-                        <input type="text" id="m_note" placeholder="비고 입력" class="w-full border border-stone-300 rounded-xl px-3 py-2">
+                        <label class="font-bold text-stone-600 block mb-1">제조원 (HACCP · 미입력 시 이전 제조원 승계)</label>
+                        <input type="text" id="m_mfg" placeholder="예: 대한제분, 서울우유" class="w-full border border-stone-300 rounded-xl px-3 py-2">
                     </div>
+                </div>
+                <div>
+                    <label class="font-bold text-stone-600 block mb-1">비고 / 입고일정</label>
+                    <input type="text" id="m_note" placeholder="비고 또는 입고일정 입력" class="w-full border border-stone-300 rounded-xl px-3 py-2">
                 </div>
             </div>
             <div class="mt-4 flex justify-end gap-2">
@@ -628,7 +647,7 @@
 
     <!-- 모달 4: 단가 변동 상세 타임라인 모달 -->
     <div id="itemPriceModal" class="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-xl w-full p-5 shadow-xl border border-stone-200">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-5 shadow-xl border border-stone-200">
             <div class="flex items-center justify-between pb-3 border-b border-stone-200">
                 <div>
                     <h3 id="priceModalTitle" class="text-base font-extrabold text-stone-900">품목 단가 변동 이력</h3>
@@ -765,33 +784,62 @@
             return '과세';
         }
 
-        // ID 내부 메타데이터(__META__EXP:...|REM:...|TAX:...) 파싱 및 직렬화 (메모이제이션 캐시로 대량 데이터 연산 가속)
+        // ID 내부 메타데이터(__META__EXP:...|REM:...|TAX:...|MFG:...|RAW_MFG:...) 파싱 및 직렬화
         const _metaCache = new Map();
         function parseMetaFromId(rawId) {
             const str = String(rawId || '');
             if (str && _metaCache.has(str)) return _metaCache.get(str);
             const idx = str.indexOf('__META__');
             if (idx === -1) {
-                return { baseId: str || ('id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)), exp: '', rem: null, tax: '' };
+                return { baseId: str || ('id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)), exp: '', rem: null, tax: '', mfg: '', rawMfg: null };
             }
             const baseId = str.slice(0, idx);
             const metaPart = str.slice(idx + 8);
             let exp = '';
             let rem = null;
             let tax = '';
+            let mfg = '';
+            let rawMfg = null;
             metaPart.split('|').forEach(pair => {
-                const [k, v] = pair.split(':');
+                const colonIdx = pair.indexOf(':');
+                if (colonIdx === -1) return;
+                const k = pair.slice(0, colonIdx);
+                const v = pair.slice(colonIdx + 1);
                 if (k === 'EXP' && v) exp = v;
                 if (k === 'REM' && v !== undefined && v !== '') {
                     const num = parseFloat(v);
                     if (!isNaN(num)) rem = num;
                 }
                 if (k === 'TAX' && (v === '과세' || v === '면세')) tax = v;
+                if (k === 'MFG' && v !== undefined) {
+                    try { mfg = decodeURIComponent(v); } catch (e) { mfg = v; }
+                }
+                if (k === 'RAW_MFG' && v !== undefined) {
+                    try { rawMfg = decodeURIComponent(v); } catch (e) { rawMfg = v; }
+                }
             });
-            const res = { baseId, exp, rem, tax };
+            const res = { baseId, exp, rem, tax, mfg, rawMfg };
             if (_metaCache.size > 10000) _metaCache.clear();
             _metaCache.set(str, res);
             return res;
+        }
+
+        // 비고 문자열(colE)에서 "[제조원: ...]" 태그와 일반 비고를 분리하는 헬퍼
+        function splitManufacturerAndNoteFromColE(rawColE) {
+            const str = String(rawColE || '').trim();
+            const m = str.match(/^\[제조원:\s*([^\]]+)\]\s*(.*)$/);
+            if (m) {
+                return { mfgFromColE: m[1].trim(), pureNote: m[2].trim() };
+            }
+            return { mfgFromColE: '', pureNote: str };
+        }
+
+        function composeColEWithManufacturer(mfg, pureNote) {
+            const cleanMfg = String(mfg || '').trim();
+            const cleanNote = String(pureNote || '').trim();
+            if (cleanMfg && cleanNote) return `[제조원:${cleanMfg}] ${cleanNote}`;
+            if (cleanMfg) return `[제조원:${cleanMfg}]`;
+            return cleanNote;
         }
 
         function buildIdWithMeta(order) {
@@ -800,12 +848,88 @@
             const exp = order.expiryDate !== undefined ? String(order.expiryDate || '') : parsed.exp;
             const rem = order.remainQty !== undefined && order.remainQty !== null ? Number(order.remainQty) : (parsed.rem !== null ? parsed.rem : (parseFloat(order.colD) || 0));
             const tax = (order.taxType === '면세' || order.taxType === '과세') ? order.taxType : (parsed.tax || inferStandardTaxType(order.colB, order.colA));
-            return `${baseId}__META__EXP:${exp}|REM:${rem}|TAX:${tax}`;
+            const mfg = order.manufacturer !== undefined ? String(order.manufacturer || '').trim() : (parsed.mfg || '');
+            const rawMfg = order.rawManufacturer !== undefined ? String(order.rawManufacturer || '').trim() : (parsed.rawMfg !== null ? parsed.rawMfg : mfg);
+            return `${baseId}__META__EXP:${exp}|REM:${rem}|TAX:${tax}|MFG:${encodeURIComponent(mfg)}|RAW_MFG:${encodeURIComponent(rawMfg)}`;
         }
 
         function getOrderExpiryDate(order) {
             if (order.expiryDate !== undefined && order.expiryDate !== '') return order.expiryDate;
             return parseMetaFromId(order.id).exp || '';
+        }
+
+        function getOrderManufacturer(order) {
+            if (order.manufacturer !== undefined && order.manufacturer !== null) return String(order.manufacturer).trim();
+            const parsed = parseMetaFromId(order.id);
+            if (parsed.mfg) return parsed.mfg;
+            return splitManufacturerAndNoteFromColE(order.colE).mfgFromColE || '';
+        }
+
+        function getOrderPureNote(order) {
+            if (order.pureNote !== undefined && order.pureNote !== null) return String(order.pureNote).trim();
+            return splitManufacturerAndNoteFromColE(order.colE).pureNote;
+        }
+
+        // 발주이력 비고 열에 표시할 텍스트 (제조원 + 비고 조합)
+        function formatOrderNoteWithManufacturer(order) {
+            const mfg = getOrderManufacturer(order);
+            const note = getOrderPureNote(order);
+            if (mfg && note) return `${mfg} · ${note}`;
+            if (mfg) return mfg;
+            if (note) return note;
+            return '-';
+        }
+
+        // HACCP 제조원 이력 자동 승계(Forward-fill) 규칙 적용
+        // 1) 제조원이 최초로 입력되었을 때 이후 제조원이 공란이어도 이전 제조원을 기록한다.
+        // 2) 최초 제조원이 공란이었으면 공란을 그대로 유지한다.
+        function reconcileManufacturerHistory() {
+            const byItemKey = {};
+            ordersData.forEach(o => {
+                const key = `${String(o.colB || '').trim()}||${String(o.colC || '').trim()}`;
+                if (!byItemKey[key]) byItemKey[key] = [];
+                byItemKey[key].push(o);
+            });
+
+            Object.values(byItemKey).forEach(list => {
+                list.sort((a, b) => {
+                    const dCmp = String(a.date || '').localeCompare(String(b.date || ''));
+                    if (dCmp !== 0) return dCmp;
+                    return parseMetaFromId(a.id).baseId.localeCompare(parseMetaFromId(b.id).baseId);
+                });
+
+                let lastKnownMfg = '';
+                list.forEach(o => {
+                    const parsed = parseMetaFromId(o.id);
+                    const { mfgFromColE, pureNote } = splitManufacturerAndNoteFromColE(o.colE);
+                    if (o.pureNote === undefined) o.pureNote = pureNote;
+
+                    // 명시적으로 입력된 원본 제조원 확인
+                    let explicitMfg = '';
+                    if (o.rawManufacturer !== undefined && o.rawManufacturer !== null) {
+                        explicitMfg = String(o.rawManufacturer).trim();
+                    } else if (parsed.rawMfg !== null && parsed.rawMfg !== undefined) {
+                        explicitMfg = String(parsed.rawMfg).trim();
+                    } else {
+                        explicitMfg = String(o.manufacturer || parsed.mfg || mfgFromColE || '').trim();
+                    }
+                    o.rawManufacturer = explicitMfg;
+
+                    if (explicitMfg) {
+                        lastKnownMfg = explicitMfg;
+                        o.manufacturer = explicitMfg;
+                    } else if (lastKnownMfg) {
+                        // 최초로 제조원이 입력된 이후 공란이면 이전 제조원 자동 승계
+                        o.manufacturer = lastKnownMfg;
+                    } else {
+                        // 최초부터 공란이면 공란 그대로 유지
+                        o.manufacturer = '';
+                    }
+
+                    o.colE = composeColEWithManufacturer(o.manufacturer, o.pureNote);
+                    o.id = buildIdWithMeta(o);
+                });
+            });
         }
 
         function getOrderRemainQty(order) {
@@ -975,6 +1099,12 @@
                     ? Number(r.remainQty)
                     : (parsed.rem !== null ? parsed.rem : (parseFloat(r.colD) || 0));
 
+                const { mfgFromColE, pureNote } = splitManufacturerAndNoteFromColE(r.colE);
+                const rawMfg = r.rawManufacturer !== undefined
+                    ? String(r.rawManufacturer || '').trim()
+                    : (parsed.rawMfg !== null ? parsed.rawMfg : (r.manufacturer || parsed.mfg || mfgFromColE || ''));
+                const mfg = String(r.manufacturer || parsed.mfg || mfgFromColE || rawMfg || '').trim();
+
                 const cleanOrder = {
                     id: rawId,
                     date: normalizeDateStr(r.date),
@@ -982,7 +1112,10 @@
                     colB: String(r.colB || '').trim(),
                     colC: String(r.colC || '').trim(),
                     colD: parseFloat(r.colD) || 0,
-                    colE: String(r.colE || '').trim(),
+                    pureNote,
+                    manufacturer: mfg,
+                    rawManufacturer: rawMfg,
+                    colE: composeColEWithManufacturer(mfg, pureNote),
                     amount: parseFloat(r.amount) || 0,
                     taxType,
                     expiryDate: exp,
@@ -996,6 +1129,7 @@
 
         // 스냅샷 및 일일 재고 사용 기록을 구글 시트 호환 행으로 직렬화
         function buildCombinedRowsForSheet() {
+            reconcileManufacturerHistory();
             const rows = ordersData.map(o => {
                 const syncedId = buildIdWithMeta(o);
                 return {
@@ -1005,7 +1139,7 @@
                     colB: o.colB || '',
                     colC: o.colC || '',
                     colD: parseFloat(o.colD) || 0,
-                    colE: o.colE || '',
+                    colE: composeColEWithManufacturer(getOrderManufacturer(o), getOrderPureNote(o)),
                     amount: parseFloat(o.amount) || 0,
                     taxType: o.taxType || inferStandardTaxType(o.colB, o.colA)
                 };
@@ -1123,6 +1257,7 @@
                 if (Array.isArray(rows)) {
                     const { normalOrders, snapshots, usageLogs } = extractSnapshotsFromRawRows(rows);
                     ordersData = normalOrders;
+                    reconcileManufacturerHistory();
                     monthlySnapshots = { ...monthlySnapshots, ...snapshots };
                     usageLogsData = usageLogs;
                     saveLocalCache();
@@ -1134,6 +1269,7 @@
             } catch (err) {
                 console.warn('구글 시트 동기화 실패:', err);
                 restoreLocalCacheIfEmpty();
+                reconcileManufacturerHistory();
                 initYearAndMonthControls();
                 renderDashboard();
                 updateDbStatusUI('error', 'DB 연결 확인 필요 (클릭)');
@@ -1421,7 +1557,7 @@
                 if (taxFilter !== 'ALL' && taxType !== taxFilter) return false;
                 if (vendorFilter !== 'ALL' && o.colA !== vendorFilter) return false;
                 if (q) {
-                    const hay = `${o.colA || ''} ${o.colB || ''} ${o.colC || ''} ${o.colE || ''} ${o.date || ''}`.toLowerCase();
+                    const hay = `${o.colA || ''} ${o.colB || ''} ${o.colC || ''} ${o.colE || ''} ${getOrderManufacturer(o)} ${getOrderPureNote(o)} ${o.date || ''}`.toLowerCase();
                     if (!hay.includes(q)) return false;
                 }
                 return true;
@@ -1430,6 +1566,7 @@
 
         // 메인 대시보드 통합 렌더링
         function renderDashboard() {
+            reconcileManufacturerHistory();
             if (activeWorkspace === 'ORDER') {
                 renderOrderWorkspace();
             } else if (activeWorkspace === 'USAGE') {
@@ -1931,6 +2068,12 @@
                         ? `<button type="button" onclick="toggleOrderTaxType('${escapeHtml(o.id)}')" title="클릭하여 과세/면세 전환" class="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 cursor-pointer">과세</button>`
                         : `<button type="button" onclick="toggleOrderTaxType('${escapeHtml(o.id)}')" title="클릭하여 과세/면세 전환" class="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer">면세</button>`;
 
+                    const mfgText = getOrderManufacturer(o);
+                    let noteCellHtml = '-';
+                    if (mfgText) {
+                        noteCellHtml = `<span class="inline-block px-1.5 py-0.5 rounded bg-amber-100/80 text-amber-950 font-extrabold text-[10px]">${escapeHtml(mfgText)}</span>`;
+                    }
+
                     return `
                         <tr class="border-b border-stone-100 hover:bg-stone-50/80 transition text-xs">
                             <td class="py-2 px-2.5 font-bold text-stone-700 truncate">${escapeHtml(o.colA)}</td>
@@ -1941,9 +2084,9 @@
                             <td class="py-2 px-2.5 text-right font-bold text-stone-800 whitespace-nowrap">${diffArrowHtml}${formatCurrency(unitAmt)}</td>
                             <td class="py-2 px-2.5 text-right font-extrabold text-amber-900 whitespace-nowrap">${formatCurrency(totalAmt)}</td>
                             <td class="py-2 px-2 text-center">
-                                <input type="date" value="${escapeHtml(expVal)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-1 bg-white text-stone-700 focus:border-amber-500 focus:outline-none w-[118px]">
+                                <input type="date" value="${escapeHtml(expVal)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-1 bg-white text-stone-700 focus:border-amber-500 focus:outline-none w-[118px]">
                             </td>
-                            <td class="py-2 px-2 text-stone-500 truncate">${escapeHtml(o.colE || '-')}</td>
+                            <td class="py-2 px-2 text-center text-stone-700 truncate" title="${escapeHtml(mfgText || '-')}">${noteCellHtml}</td>
                             <td class="py-2 px-2 text-center">
                                 <button type="button" onclick="deleteSingleOrder('${escapeHtml(o.id)}')" class="text-stone-400 hover:text-rose-600 p-1 cursor-pointer" title="이 품목 삭제">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -1968,17 +2111,17 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full table-fixed min-w-[880px] text-left border-collapse">
+                            <table class="w-full table-fixed min-w-[900px] text-left border-collapse">
                                 <colgroup>
                                     <col class="w-[10%]">
-                                    <col class="w-[18%]">
-                                    <col class="w-[9%]">
-                                    <col class="w-[7%]">
-                                    <col class="w-[7%]">
-                                    <col class="w-[12%]">
-                                    <col class="w-[12%]">
-                                    <col class="w-[13%]">
+                                    <col class="w-[17%]">
                                     <col class="w-[8%]">
+                                    <col class="w-[6%]">
+                                    <col class="w-[6%]">
+                                    <col class="w-[11%]">
+                                    <col class="w-[11%]">
+                                    <col class="w-[13%]">
+                                    <col class="w-[14%]">
                                     <col class="w-[4%]">
                                 </colgroup>
                                 <thead>
@@ -1991,7 +2134,7 @@
                                         <th class="py-2 px-2.5 text-right">발주금액(단가)</th>
                                         <th class="py-2 px-2.5 text-right">합산금액</th>
                                         <th class="py-2 px-2 text-center">소비기한</th>
-                                        <th class="py-2 px-2">비고</th>
+                                        <th class="py-2 px-2 text-center">제조원</th>
                                         <th class="py-2 px-2 text-center">삭제</th>
                                     </tr>
                                 </thead>
@@ -2131,101 +2274,122 @@
 
             let totalRemainQty = 0;
             let stockSupplyTotal = 0;
-            let stockTaxable = 0;
-            let stockTaxFree = 0;
-            let urgentCount = 0;
+            let stockTaxableSupply = 0;
+            let expiredOrSoonCount = 0;
 
-            list.forEach(o => {
+            ordersData.forEach(o => {
                 const rem = getOrderRemainQty(o);
+                if (rem <= 0) return;
                 const { unitAmt, taxType } = getOrderLineAmounts(o);
-                const rowAmt = Math.round(rem * unitAmt);
+                const rowSupply = Math.round(rem * unitAmt);
                 totalRemainQty += rem;
-                stockSupplyTotal += rowAmt;
-                if (taxType === '과세') stockTaxable += rowAmt;
-                else stockTaxFree += rowAmt;
-                const st = getExpiryStatusInfo(getOrderExpiryDate(o)).status;
-                if (rem > 0 && (st === 'EXPIRED' || st === 'SOON')) urgentCount += 1;
+                stockSupplyTotal += rowSupply;
+                if (taxType === '과세') stockTaxableSupply += rowSupply;
+                const expStatus = getExpiryStatusInfo(getOrderExpiryDate(o)).status;
+                if (expStatus === 'EXPIRED' || expStatus === 'SOON') expiredOrSoonCount += 1;
             });
-            const stockVatInc = stockSupplyTotal + Math.round(stockTaxable * 0.1);
 
-            document.getElementById('kpi1Title').textContent = '재고 관리 로트 및 총 현재고';
-            document.getElementById('kpi1Value').textContent = `${formatNumber(list.length)}개 로트`;
-            document.getElementById('kpi1Sub').textContent = `총 잔여수량 ${formatNumber(totalRemainQty)}`;
+            const stockVatInc = stockSupplyTotal + Math.round(stockTaxableSupply * 0.1);
+            const snapKeys = Object.keys(monthlySnapshots).sort();
+            const latestSnapKey = snapKeys.length > 0 ? snapKeys[snapKeys.length - 1] : null;
+            const latestSnap = latestSnapKey ? monthlySnapshots[latestSnapKey] : null;
 
-            document.getElementById('kpi2Title').textContent = '실시간 재고 자산 합계 (공급가)';
+            const snapChip = document.getElementById('snapshotCountChip');
+            if (snapChip) snapChip.textContent = `확정 ${snapKeys.length}건`;
+            renderSnapshotQuickListBar();
+
+            document.getElementById('kpi1Title').textContent = '보유 원재료 로트 수 (실시간)';
+            document.getElementById('kpi1Value').textContent = `${formatNumber(list.length)}건`;
+            document.getElementById('kpi1Sub').textContent = `현재고 총 수량 ${formatNumber(totalRemainQty)}`;
+
+            document.getElementById('kpi2Title').textContent = '실시간 현재고 자산 합계 (공급가)';
             document.getElementById('kpi2Value').textContent = formatCurrency(stockSupplyTotal);
             document.getElementById('kpi2Sub').textContent = `부가세 포함 자산: ${formatCurrency(stockVatInc)}`;
 
-            document.getElementById('kpi3Title').textContent = '과세 재고 자산 / 소비기한 점검';
-            document.getElementById('kpi3Value').textContent = formatCurrency(stockTaxable);
-            document.getElementById('kpi3Sub').textContent = `기한임박·경과 로트: ${urgentCount}건`;
+            document.getElementById('kpi3Title').textContent = '소비기한 임박·경과 주의 품목';
+            document.getElementById('kpi3Value').textContent = `${formatNumber(expiredOrSoonCount)}건`;
+            document.getElementById('kpi3Sub').textContent = `14일 이내 만료 또는 기한경과 로트`;
 
-            document.getElementById('kpi4Title').textContent = '면세 재고 자산 합계';
-            document.getElementById('kpi4Value').textContent = formatCurrency(stockTaxFree);
-            document.getElementById('kpi4Sub').textContent = `확정된 월말 스냅샷: ${Object.keys(monthlySnapshots).length}개월`;
+            document.getElementById('kpi4Title').textContent = latestSnapKey ? `최근 월말 확정 (${latestSnapKey})` : '최근 월말 확정 재고';
+            document.getElementById('kpi4Value').textContent = latestSnap ? formatCurrency(latestSnap.supplyTotal || 0) : '미확정';
+            document.getElementById('kpi4Sub').textContent = latestSnap ? `포함가: ${formatCurrency(latestSnap.vatIncludedTotal || 0)}` : '상단 바에서 월말 재고확정 가능';
 
-            const snapChip = document.getElementById('snapshotCountChip');
-            if (snapChip) snapChip.textContent = `확정 ${Object.keys(monthlySnapshots).length}건`;
-            renderSnapshotQuickListBar();
+            let filteredSupply = 0;
+            let filteredTaxable = 0;
+            list.forEach(o => {
+                const rem = getOrderRemainQty(o);
+                const { unitAmt, taxType } = getOrderLineAmounts(o);
+                const amt = Math.round(rem * unitAmt);
+                filteredSupply += amt;
+                if (taxType === '과세') filteredTaxable += amt;
+            });
 
-            document.getElementById('footerSummaryLabel').textContent = '현재 표시된 실사 재고 자산 합계';
+            document.getElementById('footerSummaryLabel').textContent = '현재 표시된 재고 자산 합계';
             document.getElementById('footerCountBadge').textContent = `${formatNumber(list.length)}건`;
-            document.getElementById('footerSupplyTotal').textContent = formatCurrency(stockSupplyTotal);
-            document.getElementById('footerVatIncludedTotal').textContent = formatCurrency(stockVatInc);
+            document.getElementById('footerSupplyTotal').textContent = formatCurrency(filteredSupply);
+            document.getElementById('footerVatIncludedTotal').textContent = formatCurrency(filteredSupply + Math.round(filteredTaxable * 0.1));
 
             const container = document.getElementById('mainContentContainer');
             if (list.length === 0) {
-                container.innerHTML = `<div class="py-16 text-center text-stone-400 text-sm font-bold">표시할 재고 로트가 없습니다.</div>`;
+                container.innerHTML = `<div class="py-16 text-center text-stone-400 text-sm font-bold">조건에 해당하는 현재 재고 내역이 없습니다.</div>`;
                 return;
             }
 
             container.innerHTML = `
                 <div class="overflow-x-auto border border-stone-200 rounded-2xl">
-                    <table class="w-full table-fixed min-w-[820px] text-left border-collapse text-xs">
+                    <table class="w-full table-fixed min-w-[860px] text-left border-collapse text-xs">
                         <colgroup>
                             <col class="w-[12%]">
                             <col class="w-[20%]">
                             <col class="w-[10%]">
-                            <col class="w-[16%]">
+                            <col class="w-[17%]">
+                            <col class="w-[8%]">
+                            <col class="w-[12%]">
                             <col class="w-[13%]">
-                            <col class="w-[13%]">
-                            <col class="w-[16%]">
+                            <col class="w-[8%]">
                         </colgroup>
                         <thead>
-                            <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600">
+                            <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 whitespace-nowrap">
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명</th>
                                 <th class="py-2.5 px-2">규격</th>
-                                <th class="py-2.5 px-2 text-center">현재고 (실사 조정)</th>
+                                <th class="py-2.5 px-2 text-center bg-emerald-100/70 text-emerald-950">현재고 (실사 조정)</th>
+                                <th class="py-2.5 px-2 text-center">과/면세</th>
                                 <th class="py-2.5 px-2.5 text-right">발주금액(단가)</th>
                                 <th class="py-2.5 px-2.5 text-right">재고 합산금액</th>
-                                <th class="py-2.5 px-2.5 text-center">소비기한 · 상태</th>
+                                <th class="py-2.5 px-2 text-center">소비기한</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${list.map(o => {
                                 const rem = getOrderRemainQty(o);
                                 const { unitAmt, taxType } = getOrderLineAmounts(o);
-                                const stockAmt = Math.round(rem * unitAmt);
-                                const expVal = getOrderExpiryDate(o);
-                                const expInfo = getExpiryStatusInfo(expVal);
+                                const rowSupply = Math.round(rem * unitAmt);
+                                const expStr = getOrderExpiryDate(o);
+                                const expInfo = getExpiryStatusInfo(expStr);
                                 return `
-                                    <tr class="border-b border-stone-100 hover:bg-stone-50 transition">
-                                        <td class="py-2 px-3 font-bold text-stone-700 truncate">${escapeHtml(o.colA)} <span class="text-[10px] text-stone-400 block">${escapeHtml(o.date)}</span></td>
-                                        <td class="py-2 px-3 font-extrabold text-stone-900 truncate">${escapeHtml(o.colB)}</td>
+                                    <tr class="border-b border-stone-100 hover:bg-stone-50">
+                                        <td class="py-2 px-3 font-bold text-stone-700 truncate">${escapeHtml(o.colA)}</td>
+                                        <td class="py-2 px-3 font-extrabold text-stone-900 truncate">
+                                            ${escapeHtml(o.colB)}
+                                            <span class="block text-[10px] font-semibold text-stone-400">발주일: ${escapeHtml(o.date || '-')}</span>
+                                        </td>
                                         <td class="py-2 px-2 text-stone-600 truncate">${escapeHtml(o.colC)}</td>
-                                        <td class="py-2 px-2">
+                                        <td class="py-2 px-2 bg-emerald-50/40">
                                             <div class="flex items-center justify-center gap-1">
                                                 <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', -1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">-</button>
-                                                <input type="number" step="any" value="${rem}" onchange="setRemainQty('${escapeHtml(o.id)}', this.value)" class="no-spinner w-14 text-center font-extrabold border border-stone-300 rounded-lg py-1 px-1 bg-white text-stone-900 focus:outline-none focus:border-emerald-600">
+                                                <input type="number" step="any" min="0" value="${rem}" onchange="setRemainQty('${escapeHtml(o.id)}', this.value)" class="no-spinner w-14 text-center font-extrabold border border-stone-300 rounded-lg py-1 px-1 bg-white text-stone-900 focus:outline-none focus:border-emerald-600">
                                                 <button type="button" onclick="adjustRemainQty('${escapeHtml(o.id)}', 1)" class="w-6 h-6 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 font-extrabold text-stone-700 flex items-center justify-center cursor-pointer">+</button>
                                             </div>
                                         </td>
-                                        <td class="py-2 px-2.5 text-right font-bold text-stone-800">${formatCurrency(unitAmt)} <span class="text-[10px] ${taxType === '과세' ? 'text-blue-600' : 'text-emerald-700'}">(${taxType})</span></td>
-                                        <td class="py-2 px-2.5 text-right font-extrabold text-emerald-900">${formatCurrency(stockAmt)}</td>
-                                        <td class="py-2 px-2.5 text-center">
-                                            <input type="date" value="${escapeHtml(expVal)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-0.5 bg-white w-[116px]">
-                                            <div class="mt-0.5"><span class="inline-block px-1.5 py-0.2 rounded text-[10px] border ${expInfo.badgeClass}">${expInfo.label}</span></div>
+                                        <td class="py-2 px-2 text-center">
+                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${taxType}</span>
+                                        </td>
+                                        <td class="py-2 px-2.5 text-right font-bold text-stone-700 whitespace-nowrap">${formatCurrency(unitAmt)}</td>
+                                        <td class="py-2 px-2.5 text-right font-extrabold text-emerald-900 whitespace-nowrap">${formatCurrency(rowSupply)}</td>
+                                        <td class="py-2 px-2 text-center">
+                                            <input type="date" value="${escapeHtml(expStr)}" onchange="updateOrderExpiry('${escapeHtml(o.id)}', this.value)" class="expiry-input text-right text-[11px] font-semibold border border-stone-200 rounded-lg px-1.5 py-0.5 bg-white text-stone-700 w-[114px]">
+                                            <span class="block mt-0.5 px-1.5 py-0.2 rounded text-[10px] border ${expInfo.badgeClass}">${expInfo.label}</span>
                                         </td>
                                     </tr>
                                 `;
@@ -2236,115 +2400,168 @@
             `;
         }
 
-        // 3. 제품 단가 · 변동 이력 워크스페이스 렌더링 (최근 변동폭 % 단독 표시)
+        // 4. 제품 단가 · 변동 이력 카탈로그 계산 및 렌더링
         function getFilteredPriceCatalogList() {
-            const grouped = {};
-            const sorted = [...ordersData].sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+            const q = (document.getElementById('priceSearchInput')?.value || '').trim().toLowerCase();
+            const changeFilter = document.getElementById('priceChangeFilterSelect')?.value || 'ALL';
+
+            const map = {};
+            const sorted = [...ordersData].sort((a, b) => {
+                const dCmp = String(a.date || '').localeCompare(String(b.date || ''));
+                if (dCmp !== 0) return dCmp;
+                return parseMetaFromId(a.id).baseId.localeCompare(parseMetaFromId(b.id).baseId);
+            });
+
             sorted.forEach(o => {
                 const unitAmt = parseFloat(o.amount) || 0;
-                if (!o.colB || unitAmt <= 0) return;
-                const key = `${o.colB}||${o.colC || ''}`;
-                const { taxType } = getOrderLineAmounts(o);
-                if (!grouped[key]) {
-                    grouped[key] = {
+                if (unitAmt <= 0) return;
+                const key = `${o.colB || ''}||${o.colC || ''}`;
+                const { qty, taxType } = getOrderLineAmounts(o);
+                const mfg = getOrderManufacturer(o);
+
+                if (!map[key]) {
+                    map[key] = {
                         key,
-                        item: o.colB,
-                        spec: o.colC || '-',
-                        vendor: o.colA || '-',
+                        item: o.colB || '',
+                        spec: o.colC || '',
+                        vendor: o.colA || '',
                         taxType,
-                        history: []
+                        minUnit: unitAmt,
+                        maxUnit: unitAmt,
+                        prevUnit: unitAmt,
+                        latestUnit: unitAmt,
+                        currentMfg: mfg || '',
+                        prevMfg: mfg || '',
+                        priceChangeCount: 0,
+                        mfgChangeCount: 0,
+                        changeCount: 0,
+                        history: [],
+                        distinctChanges: []
                     };
                 }
-                grouped[key].vendor = o.colA || grouped[key].vendor;
-                grouped[key].taxType = taxType;
-                const hist = grouped[key].history;
-                if (hist.length === 0 || hist[hist.length - 1].unitAmt !== unitAmt || hist[hist.length - 1].date !== o.date) {
-                    hist.push({ date: o.date, unitAmt, vendor: o.colA, qty: parseFloat(o.colD) || 0 });
+
+                const entry = map[key];
+                entry.vendor = o.colA || entry.vendor;
+                entry.taxType = taxType;
+                if (unitAmt < entry.minUnit) entry.minUnit = unitAmt;
+                if (unitAmt > entry.maxUnit) entry.maxUnit = unitAmt;
+
+                const lastHist = entry.history.length > 0 ? entry.history[entry.history.length - 1] : null;
+                const priceChanged = Boolean(lastHist && lastHist.unitAmt !== unitAmt);
+                const mfgChanged = Boolean(lastHist && lastHist.mfg && mfg && lastHist.mfg !== mfg);
+                const mfgInitialSet = Boolean(lastHist && !lastHist.mfg && mfg);
+
+                if (priceChanged) {
+                    entry.prevUnit = lastHist.unitAmt;
+                    entry.priceChangeCount += 1;
                 }
-            });
+                if (mfgChanged) {
+                    entry.prevMfg = lastHist.mfg;
+                    entry.mfgChangeCount += 1;
+                }
+                if (mfg) {
+                    entry.currentMfg = mfg;
+                }
 
-            const list = Object.values(grouped).map(entry => {
-                const distinctChanges = [];
-                entry.history.forEach(h => {
-                    if (distinctChanges.length === 0 || distinctChanges[distinctChanges.length - 1].unitAmt !== h.unitAmt) {
-                        distinctChanges.push(h);
-                    }
-                });
-                const latest = entry.history[entry.history.length - 1];
-                const prevDistinct = distinctChanges.length >= 2 ? distinctChanges[distinctChanges.length - 2] : latest;
-                const diffAmt = latest.unitAmt - prevDistinct.unitAmt;
-                const diffPct = prevDistinct.unitAmt > 0 ? ((diffAmt / prevDistinct.unitAmt) * 100) : 0;
-                const units = entry.history.map(h => h.unitAmt);
-                return {
-                    ...entry,
-                    distinctChanges,
-                    latestDate: latest.date,
-                    latestUnit: latest.unitAmt,
-                    prevUnit: prevDistinct.unitAmt,
-                    diffAmt,
-                    diffPct,
-                    changeCount: Math.max(0, distinctChanges.length - 1),
-                    minUnit: Math.min(...units),
-                    maxUnit: Math.max(...units)
+                const histRecord = {
+                    date: o.date || '',
+                    vendor: o.colA || '',
+                    qty,
+                    unitAmt,
+                    prevUnitAmt: lastHist ? lastHist.unitAmt : unitAmt,
+                    mfg: mfg || '',
+                    prevMfg: lastHist ? lastHist.mfg : '',
+                    priceChanged,
+                    mfgChanged,
+                    mfgInitialSet
                 };
+
+                entry.history.push(histRecord);
+                if (!lastHist || priceChanged || mfgChanged || mfgInitialSet) {
+                    entry.distinctChanges.push(histRecord);
+                }
+                entry.latestUnit = unitAmt;
+                entry.changeCount = entry.priceChangeCount + entry.mfgChangeCount;
             });
 
-            const filterMode = document.getElementById('priceChangeFilterSelect')?.value || 'ALL';
-            const q = (document.getElementById('priceSearchInput')?.value || '').trim().toLowerCase();
+            return Object.values(map).filter(it => {
+                const diff = it.latestUnit - it.prevUnit;
+                it.diff = diff;
+                it.diffPct = it.prevUnit > 0 ? ((diff / it.prevUnit) * 100) : 0;
 
-            return list.filter(it => {
-                if (filterMode === 'CHANGED' && it.changeCount === 0) return false;
-                if (filterMode === 'UP' && it.diffPct <= 0) return false;
-                if (filterMode === 'DOWN' && it.diffPct >= 0) return false;
+                if (changeFilter === 'CHANGED' && it.changeCount === 0) return false;
+                if (changeFilter === 'MFG_CHANGED' && it.mfgChangeCount === 0) return false;
+                if (changeFilter === 'UP' && it.diff <= 0) return false;
+                if (changeFilter === 'DOWN' && it.diff >= 0) return false;
                 if (q) {
-                    const hay = `${it.item} ${it.vendor} ${it.spec}`.toLowerCase();
+                    const hay = `${it.item} ${it.vendor} ${it.spec} ${it.currentMfg} ${it.prevMfg}`.toLowerCase();
                     if (!hay.includes(q)) return false;
                 }
                 return true;
-            }).sort((a, b) => Math.abs(b.diffPct) - Math.abs(a.diffPct));
+            }).sort((a, b) => Math.abs(b.diffPct) - Math.abs(a.diffPct) || b.changeCount - a.changeCount || a.item.localeCompare(b.item, 'ko'));
         }
 
         function renderPriceWorkspace() {
             const allCatalog = getFilteredPriceCatalogList();
-            const upItems = allCatalog.filter(i => i.diffPct > 0).length;
-            const downItems = allCatalog.filter(i => i.diffPct < 0).length;
-            const totalChanges = allCatalog.reduce((acc, c) => acc + c.changeCount, 0);
+            const upItems = allCatalog.filter(i => i.diff > 0);
+            const downItems = allCatalog.filter(i => i.diff < 0);
+            const mfgChangedItems = allCatalog.filter(i => i.mfgChangeCount > 0);
 
-            document.getElementById('kpi1Title').textContent = '단가 관리 원재료 품목 수';
-            document.getElementById('kpi1Value').textContent = `${formatNumber(allCatalog.length)}개 품목`;
-            document.getElementById('kpi1Sub').textContent = `단가 변동 품목 ${formatNumber(upItems + downItems)}개`;
+            document.getElementById('kpi1Title').textContent = '등록된 원재료 표준 품목 수';
+            document.getElementById('kpi1Value').textContent = `${formatNumber(allCatalog.length)}종`;
+            document.getElementById('kpi1Sub').textContent = `단가·제조원 트래킹 대상`;
 
-            document.getElementById('kpi2Title').textContent = '누적 단가 변동 감지 건수';
-            document.getElementById('kpi2Value').textContent = `${formatNumber(totalChanges)}회`;
-            document.getElementById('kpi2Sub').textContent = `개당 순수 발주단가 기준`;
+            document.getElementById('kpi2Title').textContent = '최근 단가 인상(▲) 품목';
+            document.getElementById('kpi2Value').textContent = `${formatNumber(upItems.length)}종`;
+            document.getElementById('kpi2Sub').textContent = `직전 발주단가 대비 상승`;
 
-            document.getElementById('kpi3Title').textContent = '최근 단가 인상(▲) 품목';
-            document.getElementById('kpi3Value').textContent = `${formatNumber(upItems)}개 품목`;
-            document.getElementById('kpi3Sub').textContent = `직전 변동 단가 대비 상승`;
+            document.getElementById('kpi3Title').textContent = '최근 단가 인하(▼) 품목';
+            document.getElementById('kpi3Value').textContent = `${formatNumber(downItems.length)}종`;
+            document.getElementById('kpi3Sub').textContent = `직전 발주단가 대비 하락`;
 
-            document.getElementById('kpi4Title').textContent = '최근 단가 인하(▼) 품목';
-            document.getElementById('kpi4Value').textContent = `${formatNumber(downItems)}개 품목`;
-            document.getElementById('kpi4Sub').textContent = `직전 변동 단가 대비 하락`;
+            document.getElementById('kpi4Title').textContent = 'HACCP 제조원 변경 품목';
+            document.getElementById('kpi4Value').textContent = `${formatNumber(mfgChangedItems.length)}종`;
+            document.getElementById('kpi4Sub').textContent = `초기 제조원 대비 변경 이력 있음`;
+
+            const avgUnit = allCatalog.length > 0
+                ? Math.round(allCatalog.reduce((a, c) => a + c.latestUnit, 0) / allCatalog.length)
+                : 0;
+
+            document.getElementById('footerSummaryLabel').textContent = '표시된 품목 평균 단가 요약';
+            document.getElementById('footerCountBadge').textContent = `${formatNumber(allCatalog.length)}종`;
+            document.getElementById('footerSupplyTotal').textContent = `평균 ${formatCurrency(avgUnit)}`;
+            document.getElementById('footerVatIncludedTotal').textContent = `변동품목 ${formatNumber(allCatalog.filter(i => i.changeCount > 0).length)}종`;
 
             const container = document.getElementById('mainContentContainer');
             if (allCatalog.length === 0) {
-                container.innerHTML = `<div class="py-16 text-center text-stone-400 text-sm font-bold">조건에 해당하는 품목 단가 내역이 없습니다.</div>`;
+                container.innerHTML = `<div class="py-16 text-center text-stone-400 text-sm font-bold">조건에 해당하는 품목 단가 이력이 없습니다.</div>`;
                 return;
             }
 
             container.innerHTML = `
                 <div class="overflow-x-auto border border-stone-200 rounded-2xl">
-                    <table class="w-full text-left border-collapse text-xs">
+                    <table class="w-full table-fixed min-w-[860px] text-left border-collapse text-xs">
+                        <colgroup>
+                            <col class="w-[11%]">
+                            <col class="w-[18%]">
+                            <col class="w-[9%]">
+                            <col class="w-[16%]">
+                            <col class="w-[7%]">
+                            <col class="w-[11%]">
+                            <col class="w-[11%]">
+                            <col class="w-[10%]">
+                            <col class="w-[7%]">
+                        </colgroup>
                         <thead>
-                            <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600">
+                            <tr class="bg-stone-100 border-b border-stone-200 font-extrabold text-stone-600 whitespace-nowrap">
                                 <th class="py-2.5 px-3">거래처</th>
                                 <th class="py-2.5 px-3">원재료명</th>
-                                <th class="py-2.5 px-2.5">규격</th>
+                                <th class="py-2.5 px-2">규격</th>
+                                <th class="py-2.5 px-2.5 text-center">현재 제조원 (HACCP)</th>
                                 <th class="py-2.5 px-2 text-center">과/면세</th>
                                 <th class="py-2.5 px-2.5 text-right">직전 단가</th>
                                 <th class="py-2.5 px-2.5 text-right">현재(최근) 단가</th>
-                                <th class="py-2.5 px-2.5 text-center">최근 변동폭(%)</th>
-                                <th class="py-2.5 px-2.5 text-right">최저 ~ 최고 단가</th>
+                                <th class="py-2.5 px-2 text-center">최근 변동폭</th>
                                 <th class="py-2.5 px-2 text-center">상세이력</th>
                             </tr>
                         </thead>
@@ -2356,21 +2573,38 @@
                                 } else if (it.diffPct < 0) {
                                     pctBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-700">▼ ${it.diffPct.toFixed(1)}%</span>`;
                                 }
+
+                                let mfgCellHtml = `<span class="text-stone-400">-</span>`;
+                                let mfgTooltip = it.currentMfg || '';
+                                if (it.currentMfg) {
+                                    if (it.mfgChangeCount > 0 && it.prevMfg && it.prevMfg !== it.currentMfg) {
+                                        mfgTooltip = `변경: ${it.prevMfg} → ${it.currentMfg}`;
+                                        mfgCellHtml = `
+                                            <div class="flex items-center justify-center gap-1 truncate">
+                                                <span class="font-extrabold text-amber-950 truncate">${escapeHtml(it.currentMfg)}</span>
+                                                <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold shrink-0">변경됨</span>
+                                            </div>
+                                        `;
+                                    } else {
+                                        mfgCellHtml = `<span class="font-bold text-stone-800 truncate block text-center">${escapeHtml(it.currentMfg)}</span>`;
+                                    }
+                                }
+
                                 const btnClass = it.changeCount > 0
                                     ? 'bg-stone-800 hover:bg-stone-900 text-white'
                                     : 'bg-stone-100 hover:bg-stone-200 text-stone-500';
                                 return `
-                                    <tr class="border-b border-stone-100 hover:bg-stone-50">
-                                        <td class="py-2.5 px-3 font-bold text-stone-700">${escapeHtml(it.vendor)}</td>
-                                        <td class="py-2.5 px-3 font-extrabold text-stone-900">${escapeHtml(it.item)}</td>
-                                        <td class="py-2.5 px-2.5 text-stone-600">${escapeHtml(it.spec)}</td>
+                                    <tr class="border-b border-stone-100 hover:bg-stone-50 whitespace-nowrap">
+                                        <td class="py-2.5 px-3 font-bold text-stone-700 truncate" title="${escapeHtml(it.vendor)}">${escapeHtml(it.vendor)}</td>
+                                        <td class="py-2.5 px-3 font-extrabold text-stone-900 truncate" title="${escapeHtml(it.item)}">${escapeHtml(it.item)}</td>
+                                        <td class="py-2.5 px-2 text-stone-600 truncate" title="${escapeHtml(it.spec)}">${escapeHtml(it.spec)}</td>
+                                        <td class="py-2.5 px-2.5 text-center truncate" title="${escapeHtml(mfgTooltip)}">${mfgCellHtml}</td>
                                         <td class="py-2.5 px-2 text-center">
                                             <span class="px-2 py-0.5 rounded text-[11px] font-bold ${it.taxType === '과세' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-800'}">${it.taxType}</span>
                                         </td>
                                         <td class="py-2.5 px-2.5 text-right text-stone-500 font-semibold">${formatCurrency(it.prevUnit)}</td>
                                         <td class="py-2.5 px-2.5 text-right font-extrabold text-stone-900">${formatCurrency(it.latestUnit)}</td>
-                                        <td class="py-2.5 px-2.5 text-center">${pctBadge}</td>
-                                        <td class="py-2.5 px-2.5 text-right text-stone-600">${formatCurrency(it.minUnit)} ~ ${formatCurrency(it.maxUnit)}</td>
+                                        <td class="py-2.5 px-2 text-center">${pctBadge}</td>
                                         <td class="py-2.5 px-2 text-center">
                                             <button type="button" onclick="openItemPriceHistoryModal('${escapeHtml(it.key)}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition ${btnClass}">변동(${it.changeCount})</button>
                                         </td>
@@ -2688,24 +2922,33 @@
             }
 
             if (activeWorkspace === 'PRICE') {
-                titleEl.textContent = '최근 단가 변동 품목 TOP 5';
-                subEl.textContent = '변동률(%) 절대값 순';
-                const recentChanges = getFilteredPriceCatalogList().filter(i => i.diffPct !== 0).slice(0, 5);
+                titleEl.textContent = '최근 단가·제조원 변동 TOP 5';
+                subEl.textContent = '제조원 변경 및 단가 변동률(%) 순';
+                const recentChanges = getFilteredPriceCatalogList().filter(i => i.diffPct !== 0 || i.mfgChangeCount > 0).slice(0, 5);
                 if (recentChanges.length === 0) {
-                    bodyEl.innerHTML = `<div class="py-8 text-center text-stone-400 text-xs">단가 변동 품목이 없습니다.</div>`;
+                    bodyEl.innerHTML = `<div class="py-8 text-center text-stone-400 text-xs">단가 또는 제조원 변동 품목이 없습니다.</div>`;
                     return;
                 }
                 bodyEl.innerHTML = recentChanges.map(it => {
                     const isUp = it.diffPct > 0;
+                    const mfgInfo = it.mfgChangeCount > 0
+                        ? `<span class="text-[10px] font-extrabold text-amber-800 block">제조원 변경: ${escapeHtml(it.prevMfg)} → ${escapeHtml(it.currentMfg)}</span>`
+                        : (it.currentMfg ? `<span class="text-[10px] text-stone-400 block">제조원: ${escapeHtml(it.currentMfg)}</span>` : '');
                     return `
                         <div onclick="openItemPriceHistoryModal('${escapeHtml(it.key)}')" class="p-2.5 rounded-xl border border-stone-200 hover:bg-stone-50 flex items-center justify-between cursor-pointer">
                             <div>
                                 <span class="text-xs font-extrabold text-stone-900">${escapeHtml(it.item)}</span>
                                 <span class="text-[11px] text-stone-500 block">${escapeHtml(it.vendor)} · ${formatCurrency(it.prevUnit)} → ${formatCurrency(it.latestUnit)}</span>
+                                ${mfgInfo}
                             </div>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-extrabold ${isUp ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">
-                                ${isUp ? '▲ +' : '▼ '}${it.diffPct.toFixed(1)}%
-                            </span>
+                            <div class="flex flex-col items-end gap-1">
+                                ${it.diffPct !== 0 ? `
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-extrabold ${isUp ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">
+                                        ${isUp ? '▲ +' : '▼ '}${it.diffPct.toFixed(1)}%
+                                    </span>
+                                ` : ''}
+                                ${it.mfgChangeCount > 0 ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900">제조원변경</span>` : ''}
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -3032,7 +3275,7 @@
                                 <td class="py-1.5 px-2.5 text-right font-extrabold text-emerald-900">${formatCurrency(it.rowAmt)}</td>
                                 <td class="py-1.5 px-2 text-center text-stone-500">
                                     ${isSnapshotEditMode
-                                        ? `<input type="date" value="${escapeHtml(it.expiryDate || '')}" onchange="updateTempSnapshotItem(${idx}, 'expiryDate', this.value)" class="border border-stone-300 rounded px-1 py-0.5 text-[11px]">`
+                                        ? `<input type="date" value="${escapeHtml(it.expiryDate || '')}" onchange="updateTempSnapshotItem(${idx}, 'expiryDate', this.value)" class="expiry-input text-right border border-stone-300 rounded px-1 py-0.5 text-[11px]">`
                                         : escapeHtml(it.expiryDate || '-')
                                     }
                                 </td>
@@ -3146,7 +3389,7 @@
             if (!snap) return;
             let csv = `\uFEFF대상월,거래처,원재료명,규격,과세구분,확정재고수량,개당단가,합산금액,소비기한,최근사유\n`;
             (snap.items || []).forEach(it => {
-                csv += `"${monthKey}","${it.vendor || ''}","${it.item || ''}","${it.spec || ''}","${it.taxType || ''}",${it.remainQty || 0},${it.unitAmt || 0},${it.rowAmt || 0},"${it.expiryDate || ''}","${snap.memo || ''}"\n`;
+                csv += `"${monthKey}","${it.vendor || ''}","${it.item || ''}","${it.spec || ''}","${it.taxType || ''}",${it.remainQty || 0},${it.unitAmt || 0},${it.rowAmt || 0},"${it.expiryDate || ''}","${(snap.memo || '').replace(/"/g, '""')}"\n`;
             });
             triggerCsvDownload(csv, `바로가공장_${monthKey}_확정재고스냅샷.csv`);
         }
@@ -3155,33 +3398,50 @@
             const modal = document.getElementById('snapshotDetailModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            currentEditingSnapshotMonth = null;
             isSnapshotEditMode = false;
         }
 
-        // 품목 단가 변동 이력 모달
+        // 품목 단가 및 제조원 변동 이력 모달
         function openItemPriceHistoryModal(itemKey) {
             const entry = getFilteredPriceCatalogList().find(i => i.key === itemKey);
             if (!entry) return;
-            document.getElementById('priceModalTitle').textContent = `${entry.item} (${entry.spec}) 단가 변동 타임라인`;
-            document.getElementById('priceModalSub').textContent = `주거래처: ${entry.vendor} · 구분: ${entry.taxType} · 총 단가 변동 ${entry.changeCount}회 (전체 발주 ${entry.history.length}회)`;
+            document.getElementById('priceModalTitle').textContent = `${entry.item} (${entry.spec}) 단가 · 제조원 변동 타임라인`;
+            document.getElementById('priceModalSub').textContent = `주거래처: ${entry.vendor} · 현재 제조원: ${entry.currentMfg || '미입력'} · 단가변동 ${entry.priceChangeCount}회 / 제조원변경 ${entry.mfgChangeCount}회 (전체 발주 ${entry.history.length}회)`;
             const hist = [...(entry.distinctChanges || entry.history)].reverse();
             document.getElementById('priceModalBody').innerHTML = hist.map((h, idx) => {
-                const prev = hist[idx + 1];
-                let badge = `<span class="px-2 py-0.5 rounded bg-stone-100 text-stone-500 font-bold">최초 기준단가</span>`;
-                if (prev && prev.unitAmt > 0) {
-                    const pct = ((h.unitAmt - prev.unitAmt) / prev.unitAmt) * 100;
-                    if (pct > 0) badge = `<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-600 font-extrabold">▲ +${pct.toFixed(1)}%</span>`;
-                    else if (pct < 0) badge = `<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-extrabold">▼ ${pct.toFixed(1)}%</span>`;
+                const isFirstRecord = idx === hist.length - 1;
+                const badges = [];
+
+                if (isFirstRecord) {
+                    badges.push(`<span class="px-2 py-0.5 rounded bg-stone-100 text-stone-600 font-bold whitespace-nowrap shrink-0">최초 기준 등록</span>`);
+                } else {
+                    if (h.priceChanged && h.prevUnitAmt > 0) {
+                        const pct = ((h.unitAmt - h.prevUnitAmt) / h.prevUnitAmt) * 100;
+                        if (pct > 0) badges.push(`<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-600 font-extrabold whitespace-nowrap shrink-0">단가 ▲ +${pct.toFixed(1)}% (${formatCurrency(h.prevUnitAmt)} → ${formatCurrency(h.unitAmt)})</span>`);
+                        else if (pct < 0) badges.push(`<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-extrabold whitespace-nowrap shrink-0">단가 ▼ ${pct.toFixed(1)}% (${formatCurrency(h.prevUnitAmt)} → ${formatCurrency(h.unitAmt)})</span>`);
+                    }
+                    if (h.mfgChanged) {
+                        badges.push(`<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-extrabold whitespace-nowrap shrink-0">제조원 변경: ${escapeHtml(h.prevMfg || '미입력')} → ${escapeHtml(h.mfg)}</span>`);
+                    } else if (h.mfgInitialSet) {
+                        badges.push(`<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold whitespace-nowrap shrink-0">제조원 최초 등록: ${escapeHtml(h.mfg)}</span>`);
+                    }
                 }
+
                 return `
-                    <div class="p-2.5 rounded-xl border border-stone-200 flex items-center justify-between">
-                        <div>
-                            <span class="font-extrabold text-stone-900">${escapeHtml(h.date)}</span>
-                            <span class="text-stone-500 ml-2">${escapeHtml(h.vendor)} · 발주수량 ${formatNumber(h.qty)}</span>
+                    <div class="p-3 rounded-xl border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="shrink-0">
+                            <div class="flex items-center gap-2 whitespace-nowrap">
+                                <span class="px-2 py-0.5 rounded-md bg-stone-100 font-extrabold text-stone-900 whitespace-nowrap shrink-0">${escapeHtml(h.date)}</span>
+                                <span class="text-stone-500 whitespace-nowrap">${escapeHtml(h.vendor)} · 발주수량 ${formatNumber(h.qty)}</span>
+                            </div>
+                            <div class="mt-1 text-[11px] font-bold text-stone-700 whitespace-nowrap">
+                                제조원(HACCP): <span class="${h.mfg ? 'text-amber-900 font-extrabold' : 'text-stone-400'}">${escapeHtml(h.mfg || '공란(미입력)')}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            ${badge}
-                            <span class="font-black text-stone-900 text-sm">${formatCurrency(h.unitAmt)}</span>
+                        <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+                            ${badges.join('')}
+                            <span class="font-black text-stone-900 text-sm whitespace-nowrap shrink-0">${formatCurrency(h.unitAmt)}</span>
                         </div>
                     </div>
                 `;
@@ -3244,46 +3504,47 @@
             e.preventDefault();
             e.stopPropagation();
         }
+
         function handleExcelDrop(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            if (e.dataTransfer && e.dataTransfer.files) {
                 handleExcelFiles(e.dataTransfer.files);
             }
         }
 
         function parseNumericCell(val) {
+            if (val === null || val === undefined || val === '') return 0;
             if (typeof val === 'number') return isNaN(val) ? 0 : val;
-            const s = String(val ?? '').replace(/,/g, '').trim();
-            if (!s) return 0;
-            const m = s.match(/[-+]?\d+(?:\.\d+)?/);
-            return m ? parseFloat(m[0]) : 0;
+            const cleaned = String(val).replace(/[,원₩\s]/g, '').trim();
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
         }
 
-        // 시트 전체 셀 스캔하여 2D 배열 생성 (!ref 누락 방어)
         function sheetToFull2DArray(sheet) {
+            if (!sheet) return [];
             let maxR = 0;
             let maxC = 0;
-            const cellKeys = Object.keys(sheet).filter(k => /^[A-Z]+\d+$/i.test(k));
-            cellKeys.forEach(k => {
-                const pos = XLSX.utils.decode_cell(k);
-                if (pos.r > maxR) maxR = pos.r;
-                if (pos.c > maxC) maxC = pos.c;
+            Object.keys(sheet).forEach(k => {
+                if (!/^[A-Z]+\d+$/i.test(k)) return;
+                const cellPos = XLSX.utils.decode_cell(k);
+                if (cellPos.r > maxR) maxR = cellPos.r;
+                if (cellPos.c > maxC) maxC = cellPos.c;
             });
             const rows = [];
             for (let r = 0; r <= maxR; r++) {
-                const row = [];
-                for (let c = 0; c <= Math.min(maxC, 15); c++) {
+                const rowArr = [];
+                for (let c = 0; c <= Math.max(maxC, 10); c++) {
                     const addr = XLSX.utils.encode_cell({ r, c });
                     const cell = sheet[addr];
-                    row.push(cell ? (cell.v !== undefined ? cell.v : cell.w) : '');
+                    rowArr.push(cell ? (cell.v !== undefined ? cell.v : cell.w) : '');
                 }
-                rows.push(row);
+                rows.push(rowArr);
             }
             return rows;
         }
 
-        // 바로가 공장 발주서 2차원 배열에서 품목 추출 (F열 면세 / G열 과세 정확 분리)
+        // 바로가 공장 발주서 2차원 배열에서 품목 추출 (F열 면세 / G열 과세 / I열 제조원 정확 분리)
         function parseSheetRowsToOrders(rows2D, orderDate, includeZeroQty = false) {
             let headerRowIdx = -1;
             let vendorCol = 0;
@@ -3294,9 +3555,10 @@
             let taxFreeCol = 5;
             let taxableCol = 6;
             let vatCol = 7;
+            let mfgCol = 8; // 기본 I열(index 8): 제조원
 
             for (let r = 0; r < Math.min(rows2D.length, 15); r++) {
-                const row = (rows2D[r] || []).slice(0, 9).map(c => String(c ?? '').replace(/\s+/g, ''));
+                const row = (rows2D[r] || []).slice(0, 11).map(c => String(c ?? '').replace(/\s+/g, ''));
                 const hasItemHeader = row.some(c => c.includes('품명') || c.includes('원재료') || c.includes('품목'));
                 const hasQtyOrSpec = row.some(c => c.includes('규격') || c.includes('수량') || c.includes('면세') || c.includes('과세'));
                 if (hasItemHeader && hasQtyOrSpec) {
@@ -3310,6 +3572,7 @@
                         else if (txt.includes('면세')) taxFreeCol = idx;
                         else if (txt.includes('과세') && !txt.includes('부가세')) taxableCol = idx;
                         else if (txt.includes('부가세') || txt.includes('세액')) vatCol = idx;
+                        else if (txt.includes('제조원') || txt.includes('제조사') || txt.includes('원산지')) mfgCol = idx;
                     });
                     break;
                 }
@@ -3327,14 +3590,15 @@
                 const rawSpec = String(row[specCol] ?? '').trim();
 
                 if (!rawItem) continue;
-                if (/^(합계|소계|총계|품명|원재료명|구분|면세|과세)$/.test(rawItem.replace(/\s+/g, ''))) continue;
+                if (/^(합계|소계|총계|품명|원재료명|구분|면세|과세|제조원)$/.test(rawItem.replace(/\s+/g, ''))) continue;
 
                 if (rawVendor && !/^(구분|거래처)$/.test(rawVendor)) {
                     lastVendor = rawVendor;
                 }
                 const vendor = rawVendor || lastVendor || '기타';
                 const qty = parseNumericCell(row[qtyCol]);
-                const note = String(row[noteCol] ?? '').trim();
+                const pureNote = String(row[noteCol] ?? '').trim();
+                const rawMfg = String(row[mfgCol] ?? '').trim();
                 const freePrice = parseNumericCell(row[taxFreeCol]);
                 const taxablePrice = parseNumericCell(row[taxableCol]);
                 const vatVal = parseNumericCell(row[vatCol]);
@@ -3370,7 +3634,10 @@
                     colB: rawItem,
                     colC: rawSpec,
                     colD: qty,
-                    colE: note,
+                    pureNote,
+                    manufacturer: rawMfg,
+                    rawManufacturer: rawMfg,
+                    colE: composeColEWithManufacturer(rawMfg, pureNote),
                     amount: unitAmt,
                     taxType,
                     expiryDate: '',
@@ -3392,6 +3659,7 @@
             const includeZero = Boolean(document.getElementById('includeZeroQtyUploadChk')?.checked);
 
             let totalAdded = 0;
+            let totalUpdatedMfg = 0;
             let skippedFiles = 0;
 
             for (const file of Array.from(fileList)) {
@@ -3410,40 +3678,56 @@
 
                     if (bestOrders.length === 0) continue;
 
-                    // O(1) 해시 셋(Set) 기반 고속 중복 검사 (데이터가 수천 건 쌓여도 지연 없음)
-                    const existingSignatureSet = new Set(
-                        ordersData.map(ex => `${ex.date}||${ex.colB}||${ex.colC}||${Number(ex.colD)}||${Number(ex.amount)}`)
-                    );
+                    // O(1) 해시 맵(Map)으로 중복 확인 + 기존 등록된 동일 품목에 제조원(I열)이 새로 추가되었으면 자동 보강
+                    const existingSignatureMap = new Map();
+                    ordersData.forEach(ex => {
+                        const sig = `${ex.date}||${ex.colB}||${ex.colC}||${Number(ex.colD)}||${Number(ex.amount)}`;
+                        existingSignatureMap.set(sig, ex);
+                    });
 
-                    if (skipDuplicate) {
-                        const isAllDup = bestOrders.every(nc =>
-                            existingSignatureSet.has(`${nc.date}||${nc.colB}||${nc.colC}||${Number(nc.colD)}||${Number(nc.amount)}`)
-                        );
-                        if (isAllDup) {
-                            skippedFiles += 1;
-                            continue;
-                        }
-                    }
+                    let fileAddedCount = 0;
+                    let fileMfgUpdatedCount = 0;
 
                     bestOrders.forEach(nc => {
                         const sig = `${nc.date}||${nc.colB}||${nc.colC}||${Number(nc.colD)}||${Number(nc.amount)}`;
-                        if (skipDuplicate && existingSignatureSet.has(sig)) return;
-                        existingSignatureSet.add(sig);
+                        const existingOrder = existingSignatureMap.get(sig);
+                        if (skipDuplicate && existingOrder) {
+                            // 이미 등록된 발주서라도 새 파일에 제조원(rawManufacturer)이 추가되었으면 기존 행에 제조원 업데이트
+                            if (nc.rawManufacturer && existingOrder.rawManufacturer !== nc.rawManufacturer) {
+                                existingOrder.rawManufacturer = nc.rawManufacturer;
+                                existingOrder.manufacturer = nc.rawManufacturer;
+                                existingOrder.colE = composeColEWithManufacturer(nc.rawManufacturer, getOrderPureNote(existingOrder));
+                                existingOrder.id = buildIdWithMeta(existingOrder);
+                                totalUpdatedMfg += 1;
+                                fileMfgUpdatedCount += 1;
+                            }
+                            return;
+                        }
+                        existingSignatureMap.set(sig, nc);
                         ordersData.push(nc);
                         totalAdded += 1;
+                        fileAddedCount += 1;
                     });
+
+                    if (fileAddedCount === 0 && fileMfgUpdatedCount === 0) {
+                        skippedFiles += 1;
+                    }
                 } catch (err) {
                     console.error('엑셀 파싱 오류:', err);
                 }
             }
 
+            reconcileManufacturerHistory();
             closeUploadModal();
             initYearAndMonthControls();
             renderDashboard();
 
-            if (totalAdded > 0) {
+            if (totalAdded > 0 || totalUpdatedMfg > 0) {
                 await pushAllToGoogleSheet(true);
-                showToast(`발주 품목 ${totalAdded}건이 등록되었습니다.${skippedFiles > 0 ? ` (중복 파일 ${skippedFiles}개 자동 무시)` : ''}`, 'success');
+                const msgParts = [];
+                if (totalAdded > 0) msgParts.push(`발주 품목 ${totalAdded}건 등록`);
+                if (totalUpdatedMfg > 0) msgParts.push(`기존 품목 제조원 ${totalUpdatedMfg}건 반영`);
+                showToast(`${msgParts.join(' · ')} 완료!${skippedFiles > 0 ? ` (중복 파일 ${skippedFiles}개 무시)` : ''}`, 'success');
             } else if (skippedFiles > 0) {
                 showToast(`이미 동일한 발주서가 등록되어 있어 ${skippedFiles}개 파일을 무시했습니다.`, 'info');
             } else {
@@ -3460,6 +3744,8 @@
             document.getElementById('m_qty').value = '1';
             document.getElementById('m_unitPrice').value = '';
             document.getElementById('m_expiry').value = '';
+            const mfgEl = document.getElementById('m_mfg');
+            if (mfgEl) mfgEl.value = '';
             document.getElementById('m_note').value = '';
             const modal = document.getElementById('manualAddModal');
             modal.classList.remove('hidden');
@@ -3481,15 +3767,32 @@
             const colD = parseFloat(document.getElementById('m_qty').value) || 0;
             const amount = parseFloat(document.getElementById('m_unitPrice').value) || 0;
             const expiryDate = document.getElementById('m_expiry').value || '';
-            const colE = document.getElementById('m_note').value.trim();
+            const rawMfg = (document.getElementById('m_mfg')?.value || '').trim();
+            const pureNote = document.getElementById('m_note').value.trim();
 
             if (!colB) {
                 showToast('원재료명(품명)을 입력해 주세요.', 'error');
                 return;
             }
-            const newOrder = { id: '', date, colA, colB, colC, colD, colE, amount, taxType, expiryDate, remainQty: colD };
+            const newOrder = {
+                id: '',
+                date,
+                colA,
+                colB,
+                colC,
+                colD,
+                pureNote,
+                manufacturer: rawMfg,
+                rawManufacturer: rawMfg,
+                colE: composeColEWithManufacturer(rawMfg, pureNote),
+                amount,
+                taxType,
+                expiryDate,
+                remainQty: colD
+            };
             newOrder.id = buildIdWithMeta(newOrder);
             ordersData.push(newOrder);
+            reconcileManufacturerHistory();
             closeManualAddModal();
             initYearAndMonthControls();
             renderDashboard();
@@ -3585,10 +3888,10 @@
                 showToast('내보낼 데이터가 없습니다.', 'error');
                 return;
             }
-            let csv = '\uFEFF발주일자,거래처,원재료명,규격,발주수량,현재고,과세구분,개당단가,합산금액,소비기한,비고\n';
+            let csv = '\uFEFF발주일자,거래처,원재료명,규격,발주수량,현재고,과세구분,개당단가,합산금액,소비기한,제조원(HACCP),비고\n';
             filtered.forEach(o => {
                 const { qty, unitAmt, totalAmt, taxType } = getOrderLineAmounts(o);
-                csv += `"${o.date || ''}","${o.colA || ''}","${o.colB || ''}","${o.colC || ''}",${qty},${getOrderRemainQty(o)},"${taxType}",${unitAmt},${totalAmt},"${getOrderExpiryDate(o)}","${o.colE || ''}"\n`;
+                csv += `"${o.date || ''}","${o.colA || ''}","${o.colB || ''}","${o.colC || ''}",${qty},${getOrderRemainQty(o)},"${taxType}",${unitAmt},${totalAmt},"${getOrderExpiryDate(o)}","${getOrderManufacturer(o)}","${getOrderPureNote(o)}"\n`;
             });
             triggerCsvDownload(csv, `바로가공장_발주내역_${getTodayStr()}.csv`);
         }
